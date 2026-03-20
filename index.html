@@ -3,366 +3,1401 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DMP AI Architectural Rendering Pro</title>
+<title>DMP VISION — AI Architectural Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   DESIGN PHILOSOPHY: 5 World-Class Ideas Merged
+   1. MNML.AI — Real-time sketch-to-render with style presets
+   2. ARCHIVINCI — Moodboard → Render pipeline + Room type intelligence
+   3. PROMÉAI — Sketch input + selectable render style overlays  
+   4. INTERIORAI — Virtual staging + 40+ styles rapid toggle
+   5. MYARCHITECTAI — Style reference transfer (img→style→render)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
 :root {
-  --bg:#0a0a0c; --surface:#111116; --panel:#16161d; --border:#2a2a38;
-  --accent:#c8a96e; --accent2:#7b9cff; --accent3:#4ecdc4;
-  --text:#e8e6e0; --muted:#6b6b7e; --danger:#ff5757;
+  --ink: #0d0d0f;
+  --ink2: #1a1a1f;
+  --ink3: #242429;
+  --line: #2e2e36;
+  --line2: #3d3d48;
+  --fog: #6b6b7a;
+  --mist: #9898aa;
+  --snow: #f0ede8;
+  --gold: #c9a96e;
+  --gold2: #e8c98a;
+  --gold3: rgba(201,169,110,0.12);
+  --jade: #4ecdc4;
+  --iris: #7b9cff;
+  --rose: #ff6b8a;
+  --r: 6px;
 }
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:.2;pointer-events:none;z-index:0}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-input,button,select,textarea{font-family:'Outfit',sans-serif}
-a{color:inherit;text-decoration:none}
 
-/* HEADER */
-header{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid var(--border);background:rgba(10,10,12,.96);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100}
-.logo{display:flex;align-items:center;gap:12px}
-.logo-hex{width:38px;height:38px;background:linear-gradient(135deg,#c8a96e,#a07840);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:13px;color:#0a0a0c}
-.logo-name{font-family:'Bebas Neue';font-size:20px;letter-spacing:3px;color:var(--accent)}
-.logo-sub{font-size:8px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:-3px}
-.header-mid{flex:1;padding:0 32px}
-.progress-wrap{display:flex;align-items:center;gap:12px}
-.progress-bar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(to right,var(--accent),var(--accent3));border-radius:2px;width:0%;transition:width .4s}
-.progress-txt{font-family:'DM Mono';font-size:10px;color:var(--accent);white-space:nowrap}
-.header-right{display:flex;align-items:center;gap:12px}
-.status{display:flex;align-items:center;gap:6px;font-family:'DM Mono';font-size:10px;color:var(--accent3);letter-spacing:1px}
-.status-dot{width:6px;height:6px;border-radius:50%;background:var(--accent3);box-shadow:0 0 8px var(--accent3);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.btn-keys{padding:6px 14px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;letter-spacing:.5px;transition:all .2s}
-.btn-keys:hover,.btn-keys.active{border-color:var(--accent);color:var(--accent);background:rgba(200,169,110,.08)}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-/* KEY PANEL */
-#keyPanel{display:none;border-bottom:1px solid var(--border);background:var(--surface);padding:16px 24px;position:relative;z-index:99}
-#keyPanel.open{display:block}
-.key-note{font-size:11px;color:var(--muted);background:rgba(78,205,196,.06);border:1px solid rgba(78,205,196,.15);border-radius:4px;padding:7px 12px;margin-bottom:12px}
-.key-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-.key-card{border:1px solid var(--border);border-radius:6px;padding:12px;background:var(--panel)}
-.key-card.active-prov{border-color:var(--accent)}
-.kc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-.kc-info{display:flex;gap:8px;align-items:center}
-.kc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:2px}
-.kc-name{font-size:11px;font-weight:600;color:var(--text)}
-.kc-co{font-size:9px;color:var(--muted)}
-.kc-actions{display:flex;gap:5px;align-items:center}
-.badge-ok{background:rgba(78,205,196,.15);color:var(--accent3);font-family:'DM Mono';font-size:9px;padding:2px 7px;border-radius:3px}
-.badge-err{background:rgba(255,87,87,.15);color:var(--danger);font-family:'DM Mono';font-size:9px;padding:2px 7px;border-radius:3px}
-.btn-use{padding:2px 8px;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--muted);font-size:9px;font-weight:700;cursor:pointer;letter-spacing:1px;font-family:'DM Mono';transition:all .2s}
-.btn-use:hover{border-color:var(--accent2);color:var(--accent2)}
-.btn-use.active{border-color:var(--accent)!important;color:var(--accent)!important;background:rgba(200,169,110,.1)!important}
-.key-row{display:flex;gap:5px;margin-bottom:5px}
-.key-input{flex:1;padding:7px 10px;background:var(--surface);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'DM Mono';font-size:11px;outline:none;transition:border-color .2s}
-.key-input:focus{border-color:var(--accent)}
-.btn-eye,.btn-test{padding:0 8px;border:1px solid var(--border);border-radius:3px;background:transparent;cursor:pointer;transition:all .2s;font-size:12px}
-.btn-test{color:var(--muted);font-family:'DM Mono';font-size:10px;font-weight:600}
-.btn-test:hover{border-color:var(--accent2);color:var(--accent2)}
-.kc-note{font-size:10px;color:var(--muted)}
-.kc-msg{font-size:10px;margin-top:5px;padding:4px 8px;border-radius:3px}
-.kc-msg.ok{background:rgba(78,205,196,.1);color:var(--accent3)}
-.kc-msg.err{background:rgba(255,87,87,.1);color:var(--danger)}
-.key-footer{margin-top:10px;font-size:12px;color:var(--muted)}
+html, body {
+  font-family: 'Syne', sans-serif;
+  background: var(--ink);
+  color: var(--snow);
+  min-height: 100vh;
+  overflow-x: hidden;
+  cursor: default;
+}
 
-/* MAIN LAYOUT */
-.main{display:grid;grid-template-columns:290px 1fr 250px;height:calc(100vh - 62px);position:relative;z-index:1}
+/* Grain texture overlay */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999; opacity: .4;
+}
 
-/* LEFT */
-.left{border-right:1px solid var(--border);background:var(--surface);overflow-y:auto}
-.sec{padding:14px;border-bottom:1px solid var(--border)}
-.sec-label{font-family:'DM Mono';font-size:9px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:10px}
-.upload-zone{border:1.5px dashed var(--border);border-radius:6px;padding:24px 12px;text-align:center;cursor:pointer;background:rgba(200,169,110,.02);transition:all .3s}
-.upload-zone:hover{border-color:var(--accent);background:rgba(200,169,110,.06)}
-.preview-box{position:relative;border-radius:6px;overflow:hidden;aspect-ratio:16/10;display:none}
-.preview-box img{width:100%;height:100%;object-fit:cover}
-.preview-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);display:flex;align-items:flex-end;justify-content:space-between;padding:8px 10px}
-.prov-list{display:flex;flex-direction:column;gap:6px}
-.prov-chip{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:4px;background:var(--panel);cursor:pointer;transition:all .2s;position:relative}
-.prov-chip:hover{border-color:var(--muted)}
-.prov-chip.active{border-color:var(--accent);background:rgba(200,169,110,.06)}
-.prov-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.prov-name{font-size:11px;font-weight:600;color:var(--text)}
-.prov-co{font-size:9px;color:var(--muted)}
-.style-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
-.style-btn{padding:7px 4px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--muted);font-size:11px;font-weight:500;cursor:pointer;transition:all .2s}
-.style-btn:hover,.style-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(200,169,110,.08)}
-.slider-row{margin-bottom:11px}
-.slider-hd{display:flex;justify-content:space-between;margin-bottom:5px}
-.slider-lbl{font-size:11px;color:var(--text);font-weight:500}
-.slider-val{font-family:'DM Mono';font-size:11px;color:var(--accent)}
-input[type=range]{width:100%;height:3px;-webkit-appearance:none;background:linear-gradient(to right,var(--accent) var(--v,70%),var(--border) var(--v,70%));border-radius:2px;cursor:pointer;outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(200,169,110,.5);border:2px solid var(--bg)}
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 2px; }
 
-/* CENTER */
-.center{display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
-.center-top{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);flex-shrink:0}
-.cam-grid{flex:1;overflow-y:auto;padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:9px;align-content:start}
-.cam-card{border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--surface);cursor:pointer;position:relative;transition:all .25s}
-.cam-card:hover{border-color:var(--muted);transform:translateY(-1px)}
-.cam-card.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-.cam-card.done{border-color:var(--accent3)}
-.cam-check{position:absolute;top:7px;right:7px;width:18px;height:18px;border-radius:50%;background:var(--accent);color:var(--bg);font-size:9px;font-weight:bold;display:none;align-items:center;justify-content:center;z-index:2}
-.cam-card.sel .cam-check{display:flex}
-.cam-thumb{aspect-ratio:16/9;background:var(--panel);display:flex;align-items:center;justify-content:center;font-size:22px;position:relative;overflow:hidden}
-.cam-thumb img{width:100%;height:100%;object-fit:cover}
-.cam-loading{position:absolute;inset:0;background:rgba(10,10,12,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
-.cam-spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.cam-load-txt{font-family:'DM Mono';font-size:8px;color:var(--accent);letter-spacing:1px}
-.cam-err{position:absolute;inset:0;background:rgba(255,87,87,.12);display:flex;align-items:center;justify-content:center}
-.cam-view-btn{position:absolute;inset:0;background:rgba(0,0,0,.55);border:none;color:white;font-size:12px;cursor:pointer;opacity:0;transition:opacity .2s;display:flex;align-items:center;justify-content:center}
-.cam-thumb:hover .cam-view-btn{opacity:1}
-.cam-info{padding:7px 9px}
-.cam-name{font-size:10px;font-weight:600;color:var(--text)}
-.cam-desc{font-size:9px;color:var(--muted);margin-top:1px}
-.gen-bar{padding:11px 18px;border-top:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:12px;flex-shrink:0}
-.gen-count{font-family:'DM Mono';font-size:13px;color:var(--text)}
-.gen-count strong{color:var(--accent);font-size:16px}
-.gen-prov{font-size:10px;color:var(--muted)}
-.btn-gen{flex:1;padding:12px;background:linear-gradient(135deg,var(--accent),#a07840);border:none;border-radius:5px;font-family:'Bebas Neue';font-size:17px;letter-spacing:2px;color:var(--bg);cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
-.btn-gen:hover:not(:disabled){box-shadow:0 0 20px rgba(200,169,110,.4)}
-.btn-gen:disabled{opacity:.5;cursor:not-allowed;background:var(--border);color:var(--muted)}
+input, button, select, textarea { font-family: 'Syne', sans-serif; }
+a { color: inherit; text-decoration: none; }
 
-/* RIGHT */
-.right{border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden}
-.r-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
-.r-tab{flex:1;padding:10px 0;text-align:center;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);transition:all .2s}
-.r-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.r-list{flex:1;overflow-y:auto}
-.empty-state{padding:32px 16px;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:10px}
-.empty-icon{font-size:36px;opacity:.4}
-.r-item{padding:10px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s}
-.r-item:hover{background:rgba(200,169,110,.04)}
-.r-thumb{width:100%;aspect-ratio:16/9;border-radius:4px;overflow:hidden;background:var(--panel);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:7px;position:relative}
-.r-thumb img{width:100%;height:100%;object-fit:cover}
-.r-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-.r-name{font-size:11px;font-weight:600;color:var(--text)}
-.tag-ok{background:rgba(78,205,196,.15);color:var(--accent3);font-family:'DM Mono';font-size:9px;padding:2px 7px;border-radius:3px}
-.tag-loading{background:rgba(123,156,255,.15);color:var(--accent2);font-family:'DM Mono';font-size:9px;padding:2px 7px;border-radius:3px}
-.tag-err{background:rgba(255,87,87,.15);color:var(--danger);font-family:'DM Mono';font-size:9px;padding:2px 7px;border-radius:3px}
-.r-actions{display:flex;gap:5px}
-.r-btn{flex:1;padding:5px 0;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--muted);font-size:10px;cursor:pointer;transition:all .2s;text-align:center;display:block}
-.r-btn:hover{border-color:var(--accent2);color:var(--accent2)}
-.r-err{font-size:10px;color:var(--danger);margin-top:3px}
-.hist-item{padding:9px 12px;border-bottom:1px solid var(--border);display:flex;gap:9px;align-items:center}
-.hist-thumb{width:36px;height:26px;border-radius:3px;background:var(--panel);display:flex;align-items:center;justify-content:center;font-size:13px;border:1px solid var(--border);flex-shrink:0}
-.hist-name{font-size:11px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hist-meta{font-size:9px;color:var(--muted);margin-top:1px}
+/* ── HEADER ───────────────────────────────────────────────────────── */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; height: 56px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(13,13,15,.95);
+  backdrop-filter: blur(24px);
+  position: sticky; top: 0; z-index: 200;
+}
 
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
-.modal-overlay.open{display:flex}
-.modal{background:var(--panel);border:1px solid var(--border);border-radius:8px;width:90%;max-width:820px;max-height:90vh;overflow-y:auto}
-.modal-hd{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.modal-title{font-family:'Bebas Neue';font-size:18px;letter-spacing:2px;color:var(--accent)}
-.modal-close{padding:4px 10px;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--muted);cursor:pointer;font-size:12px;transition:all .2s}
-.modal-close:hover{border-color:var(--danger);color:var(--danger)}
-.modal-body{padding:20px}
-.modal-img{width:100%;border-radius:6px;margin-bottom:14px;border:1px solid var(--border)}
-.modal-info{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:14px}
-.info-chip{padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:4px}
-.info-lbl{font-family:'DM Mono';font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:3px}
-.info-val{font-size:13px;font-weight:600;color:var(--text)}
-.modal-analysis{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:4px;padding:14px;margin-bottom:14px}
-.analysis-lbl{font-family:'DM Mono';font-size:9px;color:var(--accent);letter-spacing:2px;margin-bottom:8px}
-.analysis-txt{font-size:12px;line-height:1.7;color:var(--text)}
-.modal-actions{display:flex;gap:10px}
-.btn-primary{flex:1;padding:11px;background:linear-gradient(135deg,var(--accent),#a07840);border:none;border-radius:4px;font-family:'Bebas Neue';font-size:16px;letter-spacing:1px;color:var(--bg);cursor:pointer;text-align:center;display:block}
-.btn-secondary{padding:11px 20px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:13px;cursor:pointer;transition:all .2s}
-.btn-secondary:hover{border-color:var(--accent2);color:var(--accent2)}
+.wordmark {
+  display: flex; align-items: baseline; gap: 10px;
+}
+.wordmark-main {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 300; letter-spacing: 4px;
+  color: var(--snow); text-transform: uppercase;
+}
+.wordmark-sub {
+  font-size: 9px; font-weight: 600; letter-spacing: 3px;
+  color: var(--fog); text-transform: uppercase;
+}
 
-/* TOAST */
-.toast{position:fixed;bottom:20px;right:20px;background:var(--panel);border:1px solid var(--accent);border-radius:6px;padding:10px 16px;font-size:12px;z-index:9999;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.4);transform:translateY(60px);opacity:0;transition:all .3s;pointer-events:none}
-.toast.show{transform:translateY(0);opacity:1}
-.toast.err{border-color:var(--danger)}
-.toast.ok{border-color:var(--accent3)}
-.toast-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
-.toast.err .toast-dot{background:var(--danger)}
-.toast.ok .toast-dot{background:var(--accent3)}
+.header-center { display: flex; align-items: center; gap: 6px; flex: 1; justify-content: center; }
+
+.mode-pill {
+  display: flex; background: var(--ink2);
+  border: 1px solid var(--line); border-radius: 30px; padding: 3px; gap: 2px;
+}
+.mode-pill button {
+  padding: 5px 16px; border-radius: 24px; border: none;
+  background: transparent; color: var(--fog);
+  font-family: 'Syne'; font-size: 10px; font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+  transition: all .2s;
+}
+.mode-pill button.on {
+  background: var(--gold); color: var(--ink);
+}
+
+.header-right { display: flex; align-items: center; gap: 8px; }
+
+.live-badge {
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'JetBrains Mono'; font-size: 9px; color: var(--jade);
+  letter-spacing: 1px;
+}
+.live-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--jade); box-shadow: 0 0 8px var(--jade);
+  animation: blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.btn-api {
+  padding: 5px 12px; border: 1px solid var(--line2);
+  border-radius: 4px; background: transparent; color: var(--fog);
+  font-size: 10px; font-weight: 600; letter-spacing: 1px;
+  cursor: pointer; transition: all .2s; text-transform: uppercase;
+}
+.btn-api:hover, .btn-api.on { border-color: var(--gold); color: var(--gold); }
+
+/* ── API DRAWER ────────────────────────────────────────────────────── */
+.api-drawer {
+  display: none;
+  background: var(--ink2); border-bottom: 1px solid var(--line);
+  padding: 16px 28px; position: relative; z-index: 190;
+  animation: slideDown .2s ease;
+}
+.api-drawer.open { display: block; }
+@keyframes slideDown { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+
+.api-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 10px; }
+
+.api-card {
+  border: 1px solid var(--line); border-radius: var(--r);
+  padding: 10px; background: var(--ink3);
+}
+.api-card-head { display: flex; align-items: center; gap: 7px; margin-bottom: 7px; }
+.api-color { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.api-name { font-size: 11px; font-weight: 700; color: var(--snow); }
+.api-company { font-size: 9px; color: var(--fog); }
+.api-row { display: flex; gap: 4px; margin-bottom: 4px; }
+.api-input {
+  flex: 1; padding: 5px 8px;
+  background: var(--ink); border: 1px solid var(--line); border-radius: 3px;
+  color: var(--snow); font-family: 'JetBrains Mono'; font-size: 10px;
+  outline: none; transition: border-color .2s;
+}
+.api-input:focus { border-color: var(--gold); }
+.btn-eye, .btn-ping {
+  padding: 0 7px; border: 1px solid var(--line); border-radius: 3px;
+  background: transparent; cursor: pointer; font-size: 11px;
+  transition: all .2s; color: var(--fog);
+}
+.btn-ping { font-size: 9px; font-weight: 700; font-family: 'JetBrains Mono'; letter-spacing: .5px; }
+.btn-ping:hover { border-color: var(--iris); color: var(--iris); }
+.api-note { font-size: 9px; color: var(--fog); }
+.api-status { font-size: 9px; margin-top: 3px; padding: 2px 6px; border-radius: 2px; display:none; }
+.api-status.ok { display:block; background: rgba(78,205,196,.1); color: var(--jade); }
+.api-status.err { display:block; background: rgba(255,87,87,.1); color: #ff5757; }
+.api-footer { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--fog); }
+.active-prov-label strong { color: var(--gold); }
+.btn-close-api {
+  margin-left: auto; padding: 4px 10px; border: 1px solid var(--line); border-radius: 3px;
+  background: transparent; color: var(--fog); cursor: pointer; font-size: 10px; transition: all .2s;
+}
+.btn-close-api:hover { border-color: #ff5757; color: #ff5757; }
+
+/* ── MAIN 3-COLUMN ─────────────────────────────────────────────────── */
+.studio {
+  display: grid;
+  grid-template-columns: 280px 1fr 300px;
+  height: calc(100vh - 56px);
+}
+
+/* ━━━ LEFT SIDEBAR ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.sidebar {
+  border-right: 1px solid var(--line);
+  background: var(--ink2);
+  overflow-y: auto; display: flex; flex-direction: column;
+}
+
+.sidebar-block { padding: 16px; border-bottom: 1px solid var(--line); }
+
+.block-title {
+  font-size: 8px; font-weight: 700; letter-spacing: 2.5px;
+  color: var(--gold); text-transform: uppercase; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.block-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, var(--line), transparent); }
+
+/* Upload Zone */
+.upload-zone {
+  border: 1px dashed var(--line2); border-radius: var(--r);
+  padding: 20px 12px; text-align: center; cursor: pointer;
+  background: linear-gradient(135deg, rgba(201,169,110,.03), rgba(78,205,196,.03));
+  transition: all .3s; position: relative; overflow: hidden;
+}
+.upload-zone:hover { border-color: var(--gold); background: var(--gold3); }
+.upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.upload-icon { font-size: 26px; margin-bottom: 7px; }
+.upload-text { font-size: 11px; font-weight: 600; color: var(--snow); margin-bottom: 2px; }
+.upload-hint { font-size: 9px; color: var(--fog); }
+
+.preview-wrap {
+  position: relative; border-radius: var(--r); overflow: hidden;
+  aspect-ratio: 4/3; display: none;
+}
+.preview-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.preview-ov {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.75) 0%, transparent 60%);
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 8px 10px;
+}
+.preview-tag {
+  font-family: 'JetBrains Mono'; font-size: 8px; color: var(--gold);
+  letter-spacing: 1px; background: rgba(0,0,0,.5); padding: 2px 6px; border-radius: 2px;
+}
+.btn-swap {
+  font-size: 9px; color: var(--fog); background: rgba(0,0,0,.6);
+  border: 1px solid var(--line2); border-radius: 2px; padding: 2px 7px; cursor: pointer;
+  transition: all .2s;
+}
+.btn-swap:hover { color: var(--snow); border-color: var(--fog); }
+
+/* IDEA 2: Room Type Intelligence (from ArchiVinci) */
+.room-type-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 5px; }
+.room-btn {
+  padding: 8px 4px; border: 1px solid var(--line); border-radius: 4px;
+  background: var(--ink3); color: var(--fog); font-size: 9px; font-weight: 600;
+  cursor: pointer; transition: all .2s; text-align: center; letter-spacing: .3px;
+}
+.room-btn:hover, .room-btn.on { border-color: var(--gold); color: var(--gold); background: var(--gold3); }
+.room-btn .room-icon { font-size: 14px; display: block; margin-bottom: 2px; }
+
+/* IDEA 5: Style Reference Transfer (from MyArchitectAI) */
+.ref-upload {
+  border: 1px dashed var(--line); border-radius: var(--r); padding: 14px 10px;
+  text-align: center; cursor: pointer; transition: all .2s; position: relative;
+  background: rgba(123,156,255,.03);
+}
+.ref-upload:hover { border-color: var(--iris); background: rgba(123,156,255,.07); }
+.ref-upload input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.ref-preview {
+  width: 100%; aspect-ratio: 16/9; border-radius: 4px; overflow: hidden;
+  position: relative; display: none; margin-bottom: 6px;
+}
+.ref-preview img { width: 100%; height: 100%; object-fit: cover; }
+.ref-label { font-size: 10px; color: var(--iris); font-weight: 600; display: flex; align-items: center; gap: 5px; }
+
+/* IDEA 4: 40+ Style rapid toggle (from InteriorAI) */
+.style-scroll { display: flex; flex-wrap: wrap; gap: 4px; }
+.style-chip {
+  padding: 4px 10px; border: 1px solid var(--line); border-radius: 20px;
+  background: transparent; color: var(--fog); font-size: 9px; font-weight: 600;
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.style-chip:hover, .style-chip.on {
+  border-color: var(--gold); color: var(--gold); background: var(--gold3);
+}
+
+/* Sliders */
+.sl-row { margin-bottom: 11px; }
+.sl-hd { display: flex; justify-content: space-between; margin-bottom: 5px; }
+.sl-lbl { font-size: 10px; color: var(--snow); font-weight: 500; }
+.sl-val { font-family: 'JetBrains Mono'; font-size: 10px; color: var(--gold); }
+input[type=range] {
+  width: 100%; height: 2px; -webkit-appearance: none; appearance: none;
+  background: linear-gradient(to right, var(--gold) var(--v,50%), var(--line2) var(--v,50%));
+  border-radius: 2px; cursor: pointer; outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--gold); border: 2px solid var(--ink); box-shadow: 0 0 6px rgba(201,169,110,.5);
+}
+
+/* AI Provider in sidebar */
+.prov-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border: 1px solid var(--line); border-radius: 4px;
+  background: var(--ink3); cursor: pointer; transition: all .2s; margin-bottom: 5px;
+}
+.prov-btn:hover, .prov-btn.on { border-color: var(--gold); background: var(--gold3); }
+.prov-col { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.prov-name { font-size: 11px; font-weight: 600; color: var(--snow); }
+.prov-note { font-size: 9px; color: var(--fog); margin-top: 1px; }
+.prov-badge { margin-left: auto; font-family:'JetBrains Mono'; font-size:8px; padding:2px 5px; border-radius:2px; }
+.badge-ok { background:rgba(78,205,196,.15); color:var(--jade); }
+.badge-warn { background:rgba(201,169,110,.15); color:var(--gold); }
+
+/* ━━━ CENTER CANVAS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.canvas-area {
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--ink);
+}
+
+/* IDEA 1: Real-time Prompt Panel (from MNML.AI) */
+.prompt-zone {
+  padding: 14px 20px; border-bottom: 1px solid var(--line);
+  background: var(--ink2); flex-shrink: 0;
+}
+.prompt-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.prompt-label { font-size: 8px; font-weight: 700; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; }
+.prompt-mode-toggle {
+  display: flex; gap: 4px; background: var(--ink3); border: 1px solid var(--line);
+  border-radius: 4px; padding: 2px;
+}
+.pm-btn {
+  padding: 3px 10px; border-radius: 3px; border: none;
+  background: transparent; color: var(--fog);
+  font-size: 9px; font-weight: 700; letter-spacing: 1px; cursor: pointer; transition: all .2s;
+}
+.pm-btn.on { background: var(--iris); color: white; }
+.btn-enhance-sm {
+  margin-left: auto; display: flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border: 1px solid rgba(123,156,255,.3); border-radius: 4px;
+  background: rgba(123,156,255,.07); color: var(--iris);
+  font-size: 9px; font-weight: 700; cursor: pointer; transition: all .2s;
+}
+.btn-enhance-sm:hover:not(:disabled) { background: rgba(123,156,255,.15); }
+.btn-enhance-sm:disabled { opacity: .4; cursor: not-allowed; }
+.prompt-input-wrap { position: relative; }
+.prompt-ta {
+  width: 100%; padding: 9px 52px 9px 12px;
+  background: var(--ink3); border: 1px solid var(--line); border-radius: 5px;
+  color: var(--snow); font-size: 12px; line-height: 1.5; resize: none;
+  height: 60px; outline: none; transition: border-color .2s;
+}
+.prompt-ta:focus { border-color: var(--gold); }
+.prompt-ta::placeholder { color: var(--fog); font-size: 11px; }
+.prompt-ta:disabled { opacity: .4; cursor: not-allowed; }
+.prompt-char-count {
+  position: absolute; right: 9px; bottom: 7px;
+  font-family: 'JetBrains Mono'; font-size: 9px; color: var(--fog);
+}
+.prompt-suggestions { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.sugg-chip {
+  padding: 3px 9px; border: 1px solid var(--line); border-radius: 12px;
+  background: transparent; color: var(--fog); font-size: 9px;
+  cursor: pointer; transition: all .2s;
+}
+.sugg-chip:hover { border-color: var(--iris); color: var(--iris); }
+
+/* Canvas grid */
+.canvas-header {
+  padding: 10px 20px; border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--ink2); flex-shrink: 0;
+}
+.canvas-title { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 300; letter-spacing: 2px; color: var(--snow); font-style: italic; }
+.canvas-meta { font-family: 'JetBrains Mono'; font-size: 9px; color: var(--fog); }
+.select-all-btn {
+  padding: 4px 10px; border: 1px solid var(--line); border-radius: 3px;
+  background: transparent; color: var(--fog); font-size: 9px; font-weight: 700;
+  cursor: pointer; transition: all .2s;
+}
+.select-all-btn:hover { border-color: var(--gold2); color: var(--gold2); }
+
+/* IDEA 3: Sketch Overlay Modes (from ProméAI) */
+.cam-grid {
+  flex: 1; overflow-y: auto; padding: 14px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(152px,1fr));
+  gap: 10px; align-content: start;
+}
+
+.cam-card {
+  border: 1px solid var(--line); border-radius: var(--r);
+  overflow: hidden; cursor: pointer; position: relative;
+  transition: all .3s; background: var(--ink2);
+  transform-origin: center;
+}
+.cam-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 60%, rgba(201,169,110,.06));
+  opacity: 0; transition: opacity .3s; z-index: 1; pointer-events: none;
+}
+.cam-card:hover { border-color: var(--line2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+.cam-card:hover::before { opacity: 1; }
+.cam-card.on { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold), 0 8px 24px rgba(201,169,110,.15); }
+.cam-card.done { border-color: var(--jade); }
+
+.cam-sel-ring {
+  position: absolute; top: 6px; right: 6px; z-index: 3;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--gold); color: var(--ink);
+  font-size: 8px; font-weight: 900;
+  display: none; align-items: center; justify-content: center;
+}
+.cam-card.on .cam-sel-ring { display: flex; }
+
+.cam-thumb {
+  aspect-ratio: 16/9; background: var(--ink3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; position: relative; overflow: hidden;
+}
+.cam-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.cam-overlay {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 5px;
+  background: rgba(10,10,14,.82); opacity: 0; transition: opacity .25s;
+}
+.cam-thumb:hover .cam-overlay { opacity: 1; }
+.cam-view-btn {
+  padding: 5px 12px; border: 1px solid rgba(255,255,255,.2); border-radius: 3px;
+  background: rgba(255,255,255,.08); color: white; font-size: 10px; font-weight: 600;
+  cursor: pointer; transition: all .2s;
+}
+.cam-view-btn:hover { background: rgba(255,255,255,.16); }
+
+.cam-loading {
+  position: absolute; inset: 0; background: rgba(10,10,14,.88);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px;
+}
+.spin-ring {
+  width: 22px; height: 22px; border: 2px solid var(--line2);
+  border-top-color: var(--gold); border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.cam-load-txt {
+  font-family: 'JetBrains Mono'; font-size: 8px; color: var(--gold);
+  letter-spacing: 1.5px; animation: blink 1s infinite;
+}
+.cam-err-ov { position: absolute; inset: 0; background: rgba(255,87,87,.1); display:flex; align-items:center; justify-content:center; }
+
+.cam-info { padding: 8px 10px; }
+.cam-name { font-size: 10px; font-weight: 700; color: var(--snow); letter-spacing: .3px; }
+.cam-desc { font-size: 9px; color: var(--fog); margin-top: 1px; }
+
+/* Generate bar */
+.gen-bar {
+  padding: 12px 20px; border-top: 1px solid var(--line);
+  background: var(--ink2); display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+}
+.gen-info { flex-shrink: 0; }
+.gen-count {
+  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-size: 20px; font-weight: 300; color: var(--snow);
+}
+.gen-count strong { color: var(--gold); font-style: normal; font-family: 'Syne'; font-size: 22px; font-weight: 700; }
+.gen-via { font-size: 9px; color: var(--fog); margin-top: 1px; }
+.btn-render {
+  flex: 1; padding: 13px; 
+  background: linear-gradient(135deg, var(--gold) 0%, #a07840 100%);
+  border: none; border-radius: 5px;
+  font-family: 'Syne'; font-size: 14px; font-weight: 800; letter-spacing: 3px;
+  color: var(--ink); cursor: pointer; transition: all .35s;
+  text-transform: uppercase; position: relative; overflow: hidden;
+}
+.btn-render::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,.12), transparent);
+  transform: translateX(-120%); transition: transform .5s;
+}
+.btn-render:hover:not(:disabled)::after { transform: translateX(120%); }
+.btn-render:hover:not(:disabled) { box-shadow: 0 0 28px rgba(201,169,110,.45); transform: translateY(-1px); }
+.btn-render:disabled { opacity: .45; cursor: not-allowed; background: var(--line2); color: var(--fog); }
+
+/* Progress */
+.progress-bar-wrap {
+  height: 2px; background: var(--line); overflow: hidden; flex-shrink: 0;
+}
+.progress-bar-fill {
+  height: 100%; background: linear-gradient(to right, var(--gold), var(--jade));
+  width: 0%; transition: width .4s ease; position: relative;
+}
+.progress-bar-fill::after {
+  content: ''; position: absolute; right: 0; top: 0; bottom: 0;
+  width: 40px; background: linear-gradient(to right, transparent, white);
+  opacity: .4;
+}
+
+/* ━━━ RIGHT PANEL ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.results-panel {
+  border-left: 1px solid var(--line); background: var(--ink2);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+
+.r-tabs { display: flex; border-bottom: 1px solid var(--line); flex-shrink: 0; }
+.r-tab {
+  flex: 1; padding: 11px 0; text-align: center;
+  font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  cursor: pointer; background: none; border: none;
+  border-bottom: 2px solid transparent; color: var(--fog); transition: all .2s;
+}
+.r-tab.on { color: var(--gold); border-bottom-color: var(--gold); }
+
+.r-body { flex: 1; overflow-y: auto; }
+
+/* IDEA 3: Moodboard View */
+.moodboard-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px;
+}
+.mood-cell {
+  border-radius: 4px; overflow: hidden; aspect-ratio: 16/9;
+  background: var(--ink3); border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+  position: relative; cursor: pointer; transition: all .2s;
+}
+.mood-cell:hover { border-color: var(--line2); }
+.mood-cell img { width:100%; height:100%; object-fit:cover; }
+.mood-cell-label {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 4px 7px; background: linear-gradient(to top, rgba(0,0,0,.75), transparent);
+  font-size: 9px; font-weight: 600; color: var(--snow); letter-spacing: .5px;
+}
+.mood-cell-status {
+  position: absolute; top: 5px; right: 5px;
+  font-family: 'JetBrains Mono'; font-size: 8px; padding: 2px 5px; border-radius: 2px;
+}
+.status-done { background: rgba(78,205,196,.2); color: var(--jade); }
+.status-loading { background: rgba(201,169,110,.15); color: var(--gold); }
+.status-err { background: rgba(255,87,87,.15); color: #ff5757; }
+
+/* List view */
+.r-item {
+  padding: 9px 10px; border-bottom: 1px solid var(--line);
+  cursor: pointer; transition: background .15s;
+}
+.r-item:hover { background: rgba(201,169,110,.03); }
+.r-thumb {
+  width: 100%; aspect-ratio: 16/9; border-radius: 3px; overflow: hidden;
+  background: var(--ink3); display: flex; align-items: center; justify-content:center;
+  font-size: 20px; margin-bottom: 6px; position: relative;
+}
+.r-thumb img { width:100%;height:100%;object-fit:cover; }
+.r-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.r-name { font-size: 11px; font-weight: 600; color: var(--snow); }
+.r-actions { display: flex; gap: 4px; }
+.r-btn {
+  flex: 1; padding: 4px 0; border: 1px solid var(--line); border-radius: 2px;
+  background: transparent; color: var(--fog); font-size: 9px; cursor: pointer;
+  transition: all .2s; text-align: center; display: block;
+}
+.r-btn:hover { border-color: var(--iris); color: var(--iris); }
+.r-err-msg { font-size: 9px; color: #ff5757; margin-top: 3px; }
+
+/* Empty state */
+.empty { padding: 40px 16px; text-align: center; color: var(--fog); }
+.empty-icon { font-size: 32px; opacity: .35; margin-bottom: 10px; }
+.empty-txt { font-size: 11px; line-height: 1.6; }
+
+/* History */
+.hist-item { padding: 8px 10px; border-bottom: 1px solid var(--line); display: flex; gap: 9px; align-items: center; }
+.hist-icon { width: 34px; height: 24px; border-radius: 3px; background: var(--ink3); display: flex; align-items: center; justify-content: center; font-size: 12px; border: 1px solid var(--line); flex-shrink: 0; }
+.hist-name { font-size: 10px; font-weight: 600; color: var(--snow); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hist-meta { font-size: 9px; color: var(--fog); margin-top: 1px; }
+
+/* ── LIGHTBOX MODAL ─────────────────────────────────────────────────── */
+.lightbox {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(7,7,9,.92); backdrop-filter: blur(20px);
+  display: none; align-items: center; justify-content: center;
+}
+.lightbox.open { display: flex; }
+.lb-inner {
+  background: var(--ink2); border: 1px solid var(--line); border-radius: 8px;
+  width: 94%; max-width: 900px; max-height: 92vh; overflow-y: auto;
+}
+.lb-header {
+  padding: 14px 20px; border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.lb-title {
+  font-family: 'Cormorant Garamond', serif; font-size: 20px;
+  font-weight: 300; font-style: italic; color: var(--gold);
+  letter-spacing: 2px;
+}
+.lb-close {
+  padding: 4px 10px; border: 1px solid var(--line); border-radius: 3px;
+  background: transparent; color: var(--fog); cursor: pointer; transition: all .2s;
+}
+.lb-close:hover { border-color: #ff5757; color: #ff5757; }
+.lb-body { padding: 20px; }
+.lb-img { width: 100%; border-radius: 5px; margin-bottom: 16px; border: 1px solid var(--line); }
+.lb-chips { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
+.lb-chip { padding: 8px 12px; background: var(--ink3); border: 1px solid var(--line); border-radius: 4px; }
+.lb-chip-l { font-family: 'JetBrains Mono'; font-size: 8px; color: var(--fog); letter-spacing: 1px; margin-bottom: 3px; }
+.lb-chip-v { font-size: 12px; font-weight: 600; color: var(--snow); }
+.lb-analysis {
+  background: var(--ink3); border: 1px solid var(--line);
+  border-left: 3px solid var(--gold); border-radius: 4px; padding: 14px; margin-bottom: 14px;
+}
+.lb-analysis-lbl { font-family:'JetBrains Mono'; font-size:8px; color:var(--gold); letter-spacing:2px; margin-bottom:7px; }
+.lb-analysis-txt { font-size: 12px; line-height: 1.75; color: var(--snow); }
+.lb-prompt-box {
+  background: rgba(201,169,110,.05); border: 1px solid rgba(201,169,110,.2);
+  border-radius: 4px; padding: 10px 14px; margin-bottom: 14px; font-size: 11px;
+  color: var(--mist); line-height: 1.6; font-style: italic;
+}
+.lb-actions { display: flex; gap: 10px; }
+.lb-btn-dl {
+  flex: 1; padding: 11px; background: linear-gradient(135deg, var(--gold), #a07840);
+  border: none; border-radius: 4px; font-family: 'Syne'; font-size: 13px;
+  font-weight: 700; letter-spacing: 2px; color: var(--ink); cursor: pointer; text-align: center;
+  transition: all .2s; display: block; text-transform: uppercase;
+}
+.lb-btn-dl:hover { opacity: .88; }
+.lb-btn-cl {
+  padding: 11px 20px; background: transparent; border: 1px solid var(--line);
+  border-radius: 4px; color: var(--fog); cursor: pointer; transition: all .2s; font-size: 12px;
+}
+.lb-btn-cl:hover { border-color: var(--iris); color: var(--iris); }
+
+/* ── TOAST ─────────────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 20px; right: 20px;
+  background: var(--ink2); border: 1px solid var(--gold);
+  border-radius: 5px; padding: 10px 16px; z-index: 9998;
+  font-size: 12px; display: flex; align-items: center; gap: 8px;
+  transform: translateY(50px); opacity: 0; transition: all .3s;
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.err { border-color: #ff5757; }
+.toast.ok { border-color: var(--jade); }
+.toast-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+.toast.err .toast-dot { background: #ff5757; }
+.toast.ok .toast-dot { background: var(--jade); }
+
+/* Utility tags */
+.tag { font-family:'JetBrains Mono'; font-size:8px; padding:2px 6px; border-radius:2px; }
+.tag-ok { background:rgba(78,205,196,.15); color:var(--jade); }
+.tag-loading { background:rgba(201,169,110,.15); color:var(--gold); }
+.tag-err { background:rgba(255,87,87,.15); color:#ff5757; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">
-    <div class="logo-hex">DMP</div>
-    <div>
-      <div class="logo-name">DMP AI RENDER</div>
-      <div class="logo-sub">ARCHITECTURAL RENDERING PRO</div>
+<!-- ═══ HEADER ════════════════════════════════════════════════════════════ -->
+<header class="header">
+  <div class="wordmark">
+    <div class="wordmark-main">DMP Vision</div>
+    <div class="wordmark-sub">AI Architectural Studio</div>
+  </div>
+
+  <div class="header-center">
+    <div class="mode-pill" id="mainModePill">
+      <button class="on" onclick="setMainMode('exterior',this)">Exterior</button>
+      <button onclick="setMainMode('interior',this)">Interior</button>
+      <button onclick="setMainMode('moodboard',this)">Moodboard</button>
+      <button onclick="setMainMode('staging',this)">Staging</button>
     </div>
   </div>
-  <div class="header-mid">
-    <div class="progress-wrap" id="progressWrap" style="display:none">
-      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-      <span class="progress-txt" id="progressTxt"></span>
-    </div>
-  </div>
+
   <div class="header-right">
-    <div class="status"><div class="status-dot"></div>AI ENGINE ONLINE</div>
-    <button class="btn-keys" id="btnKeys" onclick="toggleKeys()">🔑 API KEYS</button>
+    <div class="live-badge"><div class="live-dot"></div>STUDIO ONLINE</div>
+    <button class="btn-api" id="btnApi" onclick="toggleApi()">⚙ API KEYS</button>
   </div>
 </header>
 
-<!-- KEY PANEL -->
-<div id="keyPanel">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-    <span style="font-family:'DM Mono';font-size:9px;letter-spacing:2px;color:var(--accent);text-transform:uppercase">Quản lý API Keys</span>
-    <button onclick="toggleKeys()" style="padding:4px 10px;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--muted);cursor:pointer;font-size:12px">✕ Đóng</button>
+<!-- ═══ API DRAWER ════════════════════════════════════════════════════════ -->
+<div class="api-drawer" id="apiDrawer">
+  <div class="api-grid" id="apiGrid"></div>
+  <div class="api-footer">
+    <span class="active-prov-label" id="activeProvLabel"></span>
+    <button class="btn-close-api" onclick="toggleApi()">✕ Đóng</button>
   </div>
-  <div class="key-note">🔒 Keys lưu trong localStorage của trình duyệt — không gửi đến server khi không render. Keys có thể set qua Vercel Environment Variables để dùng server-side.</div>
-  <div class="key-grid" id="keyGrid"></div>
-  <div class="key-footer" id="keyFooter"></div>
 </div>
 
-<div class="main">
-  <!-- LEFT -->
-  <div class="left">
-    <div class="sec">
-      <div class="sec-label">Tải mô hình 3D</div>
-      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
-        <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(this)">
-        <div style="font-size:28px;margin-bottom:8px">🏗️</div>
-        <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:3px">Kéo thả hoặc nhấn để tải</div>
-        <div style="font-size:10px;color:var(--muted)">PNG · JPG · WEBP</div>
+<!-- ═══ STUDIO ════════════════════════════════════════════════════════════ -->
+<div class="studio">
+
+  <!-- ─── LEFT SIDEBAR ─────────────────────────────────────────────── -->
+  <div class="sidebar">
+
+    <!-- Upload -->
+    <div class="sidebar-block">
+      <div class="block-title">Input Image</div>
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('mainFile').click()">
+        <input type="file" id="mainFile" accept="image/*" onchange="loadMainImage(this)">
+        <div class="upload-icon">🏗️</div>
+        <div class="upload-text">Drop 3D Model / Sketch</div>
+        <div class="upload-hint">PNG · JPG · WEBP · Any 3D export</div>
       </div>
-      <div class="preview-box" id="previewBox">
-        <img id="previewImg" src="" alt="model">
+      <div class="preview-wrap" id="previewWrap">
+        <img id="previewImg" src="" alt="">
         <div class="preview-ov">
-          <span style="font-family:'DM Mono';font-size:9px;color:var(--accent);letter-spacing:1px">MÔ HÌNH GỐC ✓</span>
-          <button onclick="clearImage()" style="font-size:10px;color:var(--muted);background:rgba(0,0,0,.5);border:1px solid var(--border);border-radius:3px;padding:2px 8px;cursor:pointer">Đổi ảnh</button>
+          <span class="preview-tag">SOURCE ✓</span>
+          <button class="btn-swap" onclick="clearMainImage()">↺ Change</button>
         </div>
       </div>
     </div>
 
-    <div class="sec">
-      <div class="sec-label">Nền tảng AI render</div>
-      <div class="prov-list" id="provList"></div>
-    </div>
-
-    <div class="sec">
-      <div class="sec-label">Phong cách kiến trúc</div>
-      <div class="style-grid" id="styleGrid"></div>
-    </div>
-
-    <div class="sec">
-      <div class="sec-label">Thông số</div>
-      <div class="slider-row">
-        <div class="slider-hd"><span class="slider-lbl">Ánh sáng</span><span class="slider-val" id="lightVal">70%</span></div>
-        <input type="range" min="0" max="100" value="70" style="--v:70%" oninput="updateSlider(this,'lightVal','%')">
+    <!-- IDEA 5: Style Reference Image Transfer -->
+    <div class="sidebar-block">
+      <div class="block-title">Style Reference <span style="color:var(--iris);font-size:8px;font-weight:400;margin-left:4px">↳ MyArchitectAI</span></div>
+      <div class="ref-preview" id="refPreview">
+        <img id="refImg" src="" alt="">
       </div>
-      <div class="slider-row">
-        <div class="slider-hd"><span class="slider-lbl">Vật liệu</span><span class="slider-val" id="matVal">85%</span></div>
-        <input type="range" min="0" max="100" value="85" style="--v:85%" oninput="updateSlider(this,'matVal','%')">
-      </div>
-      <div class="slider-row">
-        <div class="slider-hd"><span class="slider-lbl">Thực vật</span><span class="slider-val" id="vegVal">60%</span></div>
-        <input type="range" min="0" max="100" value="60" style="--v:60%" oninput="updateSlider(this,'vegVal','%')">
+      <div class="ref-upload" onclick="document.getElementById('refFile').click()">
+        <input type="file" id="refFile" accept="image/*" onchange="loadRefImage(this)">
+        <div class="ref-label">🖼️ Upload style reference image</div>
+        <div style="font-size:9px;color:var(--fog);margin-top:3px">AI will adopt materials, lighting & atmosphere from this image</div>
       </div>
     </div>
 
-    <div class="sec">
-      <div class="sec-label">Môi trường</div>
-      <div class="style-grid" id="envGrid"></div>
+    <!-- IDEA 2: Room Type Intelligence -->
+    <div class="sidebar-block">
+      <div class="block-title">Room / Space Type <span style="color:var(--jade);font-size:8px;font-weight:400;margin-left:4px">↳ ArchiVinci</span></div>
+      <div class="room-type-grid" id="roomGrid"></div>
     </div>
+
+    <!-- IDEA 4: 40+ Style Library -->
+    <div class="sidebar-block">
+      <div class="block-title">Style Library <span style="color:var(--rose);font-size:8px;font-weight:400;margin-left:4px">↳ InteriorAI × 40+</span></div>
+      <div class="style-scroll" id="styleScroll"></div>
+    </div>
+
+    <!-- Parameters -->
+    <div class="sidebar-block">
+      <div class="block-title">Render Parameters</div>
+      <div class="sl-row">
+        <div class="sl-hd"><span class="sl-lbl">Lighting Intensity</span><span class="sl-val" id="sv-light">70</span></div>
+        <input type="range" min="0" max="100" value="70" style="--v:70%" oninput="sl(this,'sv-light','','')">
+      </div>
+      <div class="sl-row">
+        <div class="sl-hd"><span class="sl-lbl">Material Detail</span><span class="sl-val" id="sv-mat">85</span></div>
+        <input type="range" min="0" max="100" value="85" style="--v:85%" oninput="sl(this,'sv-mat','','')">
+      </div>
+      <div class="sl-row">
+        <div class="sl-hd"><span class="sl-lbl">Vegetation</span><span class="sl-val" id="sv-veg">55</span></div>
+        <input type="range" min="0" max="100" value="55" style="--v:55%" oninput="sl(this,'sv-veg','','')">
+      </div>
+      <div class="sl-row">
+        <div class="sl-hd"><span class="sl-lbl">Atmosphere</span><span class="sl-val" id="sv-atm">65</span></div>
+        <input type="range" min="0" max="100" value="65" style="--v:65%" oninput="sl(this,'sv-atm','','')">
+      </div>
+    </div>
+
+    <!-- AI Provider -->
+    <div class="sidebar-block">
+      <div class="block-title">Render Engine</div>
+      <div id="provList"></div>
+    </div>
+
   </div>
 
-  <!-- CENTER -->
-  <div class="center">
-    <div class="center-top">
-      <span style="font-family:'Bebas Neue';font-size:18px;letter-spacing:2px;color:var(--text)">CHỌN GÓC NHÌN CAMERA</span>
-      <span style="font-family:'DM Mono';font-size:11px;color:var(--muted)" id="camCount">0 / 14 đã chọn</span>
+  <!-- ─── CENTER CANVAS ─────────────────────────────────────────────── -->
+  <div class="canvas-area">
+
+    <!-- IDEA 1: Real-time Prompt Input -->
+    <div class="prompt-zone">
+      <div class="prompt-top">
+        <span class="prompt-label">✏ Prompt</span>
+        <div class="prompt-mode-toggle">
+          <button class="pm-btn on" id="pmAuto" onclick="setPMode('auto')">AUTO</button>
+          <button class="pm-btn" id="pmCustom" onclick="setPMode('custom')">CUSTOM</button>
+        </div>
+        <button class="btn-enhance-sm" id="btnEnhance" onclick="enhancePrompt()" disabled>
+          <span id="enhIcon">✨</span> AI ENHANCE
+        </button>
+      </div>
+      <div class="prompt-input-wrap">
+        <textarea class="prompt-ta" id="promptTa" disabled
+          placeholder="Switch to CUSTOM mode to write your own prompt…"
+          oninput="onPromptInput(this)"></textarea>
+        <span class="prompt-char-count" id="promptCharCount">0</span>
+      </div>
+      <div class="prompt-suggestions" id="promptSuggs"></div>
     </div>
+
+    <!-- Canvas header -->
+    <div class="canvas-header">
+      <span class="canvas-title" id="canvasTitle">Select Camera Angles</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="canvas-meta" id="camMeta">0 / 14 selected</span>
+        <button class="select-all-btn" onclick="toggleSelectAll()">SELECT ALL</button>
+      </div>
+    </div>
+
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progFill"></div></div>
+
+    <!-- Camera Grid -->
     <div class="cam-grid" id="camGrid"></div>
+
+    <!-- Generate Bar -->
     <div class="gen-bar">
-      <div>
-        <div class="gen-count"><strong id="selCount">0</strong> góc</div>
-        <div class="gen-prov">via <strong id="genProvName" style="color:#10a37f">DALL·E 3</strong></div>
+      <div class="gen-info">
+        <div class="gen-count"><strong id="genSelNum">0</strong> angles</div>
+        <div class="gen-via" id="genVia">via DALL·E 3</div>
       </div>
-      <button class="btn-gen" id="btnGen" disabled onclick="startGenerate()">⚡ DIỄN HỌA AI</button>
+      <button class="btn-render" id="btnRender" disabled onclick="startRender()">
+        RENDER NOW
+      </button>
     </div>
+
   </div>
 
-  <!-- RIGHT -->
-  <div class="right">
+  <!-- ─── RIGHT RESULTS PANEL ─────────────────────────────────────── -->
+  <div class="results-panel">
     <div class="r-tabs">
-      <button class="r-tab active" onclick="switchTab(this,'results')">KẾT QUẢ</button>
-      <button class="r-tab" onclick="switchTab(this,'history')">LỊCH SỬ</button>
+      <button class="r-tab on" onclick="switchRTab(this,'moodboard')">Moodboard</button>
+      <button class="r-tab" onclick="switchRTab(this,'list')">List</button>
+      <button class="r-tab" onclick="switchRTab(this,'history')">History</button>
     </div>
-    <div class="r-list" id="resultsList">
-      <div class="empty-state"><div class="empty-icon">🎨</div><p style="font-size:11px;line-height:1.6">Chọn góc nhìn và nhấn Diễn Họa AI</p></div>
-    </div>
-    <div class="r-list" id="historyList" style="display:none"></div>
-  </div>
-</div>
-
-<!-- MODAL -->
-<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <div class="modal-hd">
-      <span class="modal-title" id="modalTitle">KẾT QUẢ</span>
-      <button class="modal-close" onclick="closeModal()">✕ Đóng</button>
-    </div>
-    <div class="modal-body">
-      <div id="modalImgWrap"></div>
-      <div class="modal-info" id="modalInfo"></div>
-      <div class="modal-analysis" id="modalAnalysis" style="display:none">
-        <div class="analysis-lbl">AI ANALYSIS</div>
-        <div class="analysis-txt" id="modalAnalysisTxt"></div>
+    <div class="r-body" id="rBody">
+      <div class="empty">
+        <div class="empty-icon">🎨</div>
+        <div class="empty-txt">Select camera angles<br>and press Render Now</div>
       </div>
-      <div class="modal-actions" id="modalActions"></div>
     </div>
   </div>
 </div>
 
+<!-- ═══ LIGHTBOX ══════════════════════════════════════════════════════════ -->
+<div class="lightbox" id="lightbox" onclick="if(event.target===this)closeLB()">
+  <div class="lb-inner">
+    <div class="lb-header">
+      <span class="lb-title" id="lbTitle">Render Result</span>
+      <button class="lb-close" onclick="closeLB()">✕ Close</button>
+    </div>
+    <div class="lb-body" id="lbBody"></div>
+  </div>
+</div>
+
+<!-- ═══ TOAST ════════════════════════════════════════════════════════════ -->
 <div class="toast" id="toast"><div class="toast-dot"></div><span id="toastMsg"></span></div>
 
 <script>
-const CAMERAS=[
-  {id:0,name:'Mặt Chính',desc:'Toàn bộ công trình',icon:'🏗️',light:'bright natural daylight, sharp shadows'},
-  {id:1,name:'Góc Chéo 45°',desc:'Phối cảnh kết hợp',icon:'📐',light:'natural daylight, perspective view'},
-  {id:2,name:'Góc Thấp',desc:'Tăng chiều cao ấn tượng',icon:'⬇️',light:'low angle shot, dramatic sky'},
-  {id:3,name:'Toàn Cảnh',desc:'Nhìn từ trên cao',icon:'🔭',light:'aerial bird eye view'},
-  {id:4,name:'Cận Vật Liệu',desc:'Chi tiết texture',icon:'🔍',light:'close-up macro detail'},
-  {id:5,name:'Không Gian',desc:'Bối cảnh tổng thể',icon:'🌐',light:'wide angle expansive context'},
-  {id:6,name:'Ban Ngày',desc:'Ánh sáng tự nhiên',icon:'☀️',light:'midday sun high key lighting'},
-  {id:7,name:'Chiều Tà',desc:'Ánh vàng buổi chiều',icon:'🌅',light:'warm golden afternoon light, long shadows'},
-  {id:8,name:'Hoàng Hôn',desc:'Sky gradient đặc sắc',icon:'🌇',light:'dramatic sunset orange-pink sky, god rays'},
-  {id:9,name:'Ban Đêm',desc:'Chiếu sáng kiến trúc',icon:'🌃',light:'night scene architectural lighting illuminated windows'},
-  {id:10,name:'Nội Thất',desc:'Không gian chính',icon:'🛋️',light:'interior photography warm ambient lighting'},
-  {id:11,name:'Lối Di Chuyển',desc:'Tiếp cận công trình',icon:'🚶',light:'pedestrian level entrance approach'},
-  {id:12,name:'Người + Tỷ Lệ',desc:'Cảnh quan sinh động',icon:'👥',light:'human figures for scale lively scene'},
-  {id:13,name:'Marketing',desc:'Góc nghệ thuật nhất',icon:'✨',light:'cinematic composition dramatic hero shot'},
+/* ═══════════════════════════════════════════════════════════════════════════
+   DATA
+══════════════════════════════════════════════════════════════════════════════*/
+const CAMERAS = [
+  {id:0, name:'Main Facade',       desc:'Full frontal view',          icon:'🏛️', light:'bright natural daylight, sharp shadows, symmetric composition'},
+  {id:1, name:'45° Diagonal',      desc:'Dynamic perspective',        icon:'📐', light:'natural daylight, diagonal composition, depth of field'},
+  {id:2, name:'Worm\'s Eye',       desc:'Dramatic height illusion',   icon:'⬆️', light:'low angle, dramatic sky, powerful verticals'},
+  {id:3, name:'Bird\'s Eye',       desc:'Site overview',              icon:'🦅', light:'aerial view, topographic context, soft haze'},
+  {id:4, name:'Material Close-up', desc:'Texture & surface detail',   icon:'🔬', light:'macro close-up, raking light, material study'},
+  {id:5, name:'Contextual Wide',   desc:'Neighbourhood context',      icon:'🌆', light:'wide angle, environmental context, urban scale'},
+  {id:6, name:'Golden Hour',       desc:'Warm afternoon magic',       icon:'☀️', light:'golden hour sunlight, warm orange tones, long shadows, lens flare'},
+  {id:7, name:'Blue Hour',         desc:'Twilight atmosphere',        icon:'🌆', light:'blue hour dusk, warm interior lights glowing, deep blue sky'},
+  {id:8, name:'Sunset Drama',      desc:'Cinematic sky gradient',     icon:'🌇', light:'dramatic sunset, orange-crimson sky, god rays, silhouette'},
+  {id:9, name:'Night Architecture',desc:'Illuminated structure',      icon:'🌃', light:'night scene, architectural uplighting, spotlights, glowing windows, reflections'},
+  {id:10,name:'Interior Hero',     desc:'Main living space',          icon:'🛋️', light:'interior photography, warm ambient, bounce light, lifestyle staging'},
+  {id:11,name:'Approach Walk',     desc:'Entry sequence',             icon:'🚶', light:'pedestrian arrival, pathway, softscape foreground'},
+  {id:12,name:'Human Scale',       desc:'Figures for proportion',     icon:'👥', light:'street level, human activity, lively scene, lifestyle'},
+  {id:13,name:'Hero Marketing',    desc:'Ultimate cinematic shot',    icon:'✨', light:'cinematic composition, dramatic lighting, bokeh, magazine quality'},
 ];
 
-const PROVIDERS=[
-  {id:'dalle3',name:'DALL·E 3',company:'OpenAI',color:'#10a37f',field:'openai',ph:'sk-...',note:'HD 1792×1024 · style natural'},
-  {id:'stability',name:'Stable XL',company:'Stability AI',color:'#7c3aed',field:'stability',ph:'sk-...',note:'img2img · 1024×576'},
-  {id:'replicate',name:'SDXL',company:'Replicate',color:'#ef4444',field:'replicate',ph:'r8_...',note:'1344×768 · async polling'},
-  {id:'gemini',name:'Imagen 3',company:'Google Gemini',color:'#4285f4',field:'gemini',ph:'AIza...',note:'Imagen 3 · Vision phân tích'},
-  {id:'anthropic',name:'Claude Vision',company:'Anthropic',color:'#c8a96e',field:'anthropic',ph:'sk-ant-...',note:'Phân tích & tạo prompt AI'},
+const PROVIDERS = [
+  {id:'dalle3',    name:'DALL·E 3',    company:'OpenAI',       color:'#10a37f', field:'openai',    ph:'sk-...',      note:'HD 1792×1024, CORS-safe'},
+  {id:'stability', name:'Stable XL',   company:'Stability AI', color:'#7c3aed', field:'stability', ph:'sk-...',      note:'img2img support'},
+  {id:'replicate', name:'SDXL',        company:'Replicate',    color:'#ef4444', field:'replicate', ph:'r8_...',      note:'1344×768, async'},
+  {id:'gemini',    name:'Imagen 3',    company:'Google',       color:'#4285f4', field:'gemini',    ph:'AIza...',     note:'Imagen 3 + Vision'},
+  {id:'anthropic', name:'Claude Vision',company:'Anthropic',   color:'#c8a96e', field:'anthropic', ph:'sk-ant-...', note:'Analysis only'},
 ];
 
-const STYLES=['Hiện đại','Cổ điển','Tối giản','Tropical','Industrial','Luxury'];
-const ENVS=['Đô thị','Biển','Núi','Ngoại ô'];
+const ROOM_TYPES = [
+  {id:'living',    label:'Living',   icon:'🛋️'},
+  {id:'bedroom',   label:'Bedroom',  icon:'🛏️'},
+  {id:'kitchen',   label:'Kitchen',  icon:'🍳'},
+  {id:'bathroom',  label:'Bathroom', icon:'🚿'},
+  {id:'office',    label:'Office',   icon:'💼'},
+  {id:'dining',    label:'Dining',   icon:'🍽️'},
+  {id:'lobby',     label:'Lobby',    icon:'🏨'},
+  {id:'facade',    label:'Facade',   icon:'🏢'},
+  {id:'landscape', label:'Landscape',icon:'🌿'},
+];
 
+const STYLES_ALL = [
+  'Minimalist','Japandi','Scandinavian','Wabi-Sabi',
+  'Modern Luxury','Art Deco','Bauhaus','Brutalist',
+  'Tropical','Biophilic','Industrial','Loft',
+  'Neoclassical','Mediterranean','Coastal','Rustic',
+  'High-Tech','Futurist','Parametric','Organic',
+  'Dark Academia','Moody','Maximalist','Eclectic',
+  'Zen','Bohemian','Mid-Century','Retro',
+  'Cyberpunk','Glass Box','Concrete Poetry','Light-Filled',
+  'Earthy Tones','Monochrome','Pastel','Bold Primary',
+  'Copper + Stone','Marble + Gold','Timber + Steel','Living Walls',
+];
+
+const MODE_SUGGESTIONS = {
+  exterior: ['Modern villa with floating volumes','Parametric facade with solar fins','Glass tower reflecting sky','Tropical resort with infinity pool'],
+  interior: ['Minimalist living room with warm oak','Kitchen with island and pendant lights','Master bedroom with floor-to-ceiling windows','Open-plan loft with exposed concrete'],
+  moodboard: ['Luxury hotel lobby mood','Japandi bedroom palette','Industrial cafe concept','Biophilic office space'],
+  staging: ['Empty room staged as luxury apartment','Virtual furniture placement modern style','Before-after room transformation','Airbnb ready bedroom staging'],
+};
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════════════════════════*/
 let keys={}, keyStatus={}, activeProv='dalle3';
-let uploadedImg=null, selectedCams=new Set(), curStyle='Hiện đại', curEnv='Đô thị';
-let sliders={light:70,mat:85,veg:60};
-let results={}, running=false, history=[];
-let toastTimer, currentModal=null;
+let mainImage=null, refImage=null;
+let selectedCams=new Set(), curRoomType='facade', curStyle='Minimalist';
+let mainMode='exterior', promptMode='auto', customPrompt='', promptHistory=[];
+let sliderVals={light:70,mat:85,veg:55,atm:65};
+let results={}, running=false, progN=0, progTotal=0;
+let history=[], rTab='moodboard', toastTimer;
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════════════════════════*/
 function init(){
-  try{keys=JSON.parse(localStorage.getItem('dmp_keys')||'{}')}catch{}
-  try{history=JSON.parse(localStorage.getItem('dmp_hist')||'[]')}catch{}
-  renderProviders(); renderStyles(); renderEnvs(); renderCameras(); renderHistory();
+  try{keys=JSON.parse(localStorage.getItem('dmpv_keys')||'{}')}catch{}
+  try{history=JSON.parse(localStorage.getItem('dmpv_hist')||'[]')}catch{}
+  try{promptHistory=JSON.parse(localStorage.getItem('dmpv_prompts')||'[]')}catch{}
+  buildApiGrid(); buildRoomGrid(); buildStyleScroll(); buildCamGrid();
+  buildProvList(); updateGenBtn(); renderSuggestions(); renderRPanel();
 }
 
-// ── TOAST ─────────────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════════════════
+   API KEYS
+══════════════════════════════════════════════════════════════════════════════*/
+function toggleApi(){
+  document.getElementById('apiDrawer').classList.toggle('open');
+  document.getElementById('btnApi').classList.toggle('on');
+}
+
+function buildApiGrid(){
+  const g=document.getElementById('apiGrid');
+  g.innerHTML=PROVIDERS.map(p=>`
+    <div class="api-card" id="acard_${p.id}" style="${activeProv===p.id?'border-color:var(--gold)':''}">
+      <div class="api-card-head">
+        <div class="api-color" style="background:${p.color}"></div>
+        <div><div class="api-name">${p.name}</div><div class="api-company">${p.company}</div></div>
+        ${keyStatus[p.id]?`<span class="${keyStatus[p.id].valid?'badge-ok':'tag-err'} tag" style="margin-left:auto">${keyStatus[p.id].valid?'✓':'✗'}</span>`:''}
+      </div>
+      <div class="api-row">
+        <input type="password" class="api-input" id="ainp_${p.id}" placeholder="${p.ph}" value="${keys[p.field]||''}"
+          oninput="keys['${p.field}']=this.value;localStorage.setItem('dmpv_keys',JSON.stringify(keys));buildProvList()">
+        <button class="btn-eye" onclick="toggleEye('ainp_${p.id}')">👁</button>
+        <button class="btn-ping" id="aping_${p.id}" onclick="pingKey('${p.id}')">TEST</button>
+      </div>
+      <div class="api-note">${p.note}</div>
+      <div class="api-status" id="astatus_${p.id}"></div>
+      ${p.id!=='anthropic'?`<button style="margin-top:6px;width:100%;padding:4px;border:1px solid ${activeProv===p.id?'var(--gold)':'var(--line)'};border-radius:3px;background:${activeProv===p.id?'var(--gold3)':'transparent'};color:${activeProv===p.id?'var(--gold)':'var(--fog)'};font-size:9px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:all .2s" onclick="setActiveProv('${p.id}')">${activeProv===p.id?'✓ ACTIVE':'USE THIS'}</button>`:''}
+    </div>
+  `).join('');
+  const ap=PROVIDERS.find(p=>p.id===activeProv);
+  document.getElementById('activeProvLabel').innerHTML=`Active: <strong>${ap.name}</strong> ${keys.anthropic?'· <span style="color:var(--jade)">✓ Claude Vision</span>':''}`;
+}
+
+function toggleEye(id){const el=document.getElementById(id);el.type=el.type==='password'?'text':'password';}
+
+async function pingKey(id){
+  const p=PROVIDERS.find(x=>x.id===id);
+  const key=keys[p.field];
+  if(!key){toast('Enter API key first','err');return;}
+  const btn=document.getElementById('aping_'+id);
+  const stat=document.getElementById('astatus_'+id);
+  btn.textContent='···'; btn.disabled=true;
+  stat.className='api-status'; stat.style.display='none';
+  try{
+    let valid=false,msg='';
+    if(id==='anthropic'){
+      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:10,messages:[{role:'user',content:'hi'}]})});
+      const d=await r.json(); valid=r.ok||d.error?.type==='invalid_request_error';
+      msg=valid?'Claude key valid ✓':(d.error?.message||'Invalid key');
+    }else if(id==='openai'){
+      const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':'Bearer '+key}});
+      valid=r.ok; msg=valid?'OpenAI key valid ✓':'Invalid key';
+    }else if(id==='stability'){
+      const r=await fetch('https://api.stability.ai/v1/user/account',{headers:{'Authorization':'Bearer '+key}});
+      valid=r.ok; msg=valid?'Stability AI key valid ✓':'Invalid key';
+    }else if(id==='replicate'){
+      const r=await fetch('https://api.replicate.com/v1/account',{headers:{'Authorization':'Token '+key}});
+      const d=r.ok?await r.json():{};valid=r.ok;msg=valid?`Replicate: @${d.username} ✓`:'Invalid key';
+    }else if(id==='gemini'){
+      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+      const d=await r.json();valid=r.ok&&Array.isArray(d.models);
+      msg=valid?`Gemini key valid ✓ (${d.models?.length||0} models)`:'Invalid key';
+    }
+    keyStatus[id]={valid,message:msg};
+    stat.textContent=msg; stat.className='api-status '+(valid?'ok':'err'); stat.style.display='block';
+    toast(msg,valid?'ok':'err');
+    buildApiGrid(); buildProvList();
+  }catch(e){toast('Connection error: '+e.message,'err');}
+  btn.textContent='TEST'; btn.disabled=false;
+}
+
+function setActiveProv(id){activeProv=id;buildApiGrid();buildProvList();updateGenBtn();}
+
+function buildProvList(){
+  document.getElementById('provList').innerHTML=PROVIDERS.filter(p=>p.id!=='anthropic').map(p=>`
+    <div class="prov-btn${activeProv===p.id?' on':''}" onclick="setActiveProv('${p.id}')">
+      <div class="prov-col" style="background:${p.color}"></div>
+      <div><div class="prov-name">${p.name}</div><div class="prov-note">${p.note}</div></div>
+      ${keyStatus[p.id]?.valid?'<span class="prov-badge badge-ok">✓</span>':!keys[p.field]?'<span class="prov-badge badge-warn">!</span>':''}
+    </div>
+  `).join('');
+  const ap=PROVIDERS.find(p=>p.id===activeProv);
+  const via=document.getElementById('genVia');
+  if(via) via.textContent=`via ${ap.name}`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UPLOAD
+══════════════════════════════════════════════════════════════════════════════*/
+function loadMainImage(inp){
+  const f=inp.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    mainImage=e.target.result;
+    document.getElementById('previewImg').src=mainImage;
+    document.getElementById('previewWrap').style.display='block';
+    document.getElementById('uploadZone').style.display='none';
+    updateGenBtn(); toast('✓ Source image loaded');
+  };r.readAsDataURL(f);
+}
+function clearMainImage(){
+  mainImage=null; results={};
+  document.getElementById('previewWrap').style.display='none';
+  document.getElementById('uploadZone').style.display='block';
+  document.getElementById('mainFile').value='';
+  updateGenBtn(); renderRPanel();
+}
+function loadRefImage(inp){
+  const f=inp.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    refImage=e.target.result;
+    document.getElementById('refImg').src=refImage;
+    document.getElementById('refPreview').style.display='block';
+    toast('✓ Style reference loaded — AI will transfer this aesthetic');
+  };r.readAsDataURL(f);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ROOM / STYLE
+══════════════════════════════════════════════════════════════════════════════*/
+function buildRoomGrid(){
+  document.getElementById('roomGrid').innerHTML=ROOM_TYPES.map(rt=>`
+    <button class="room-btn${curRoomType===rt.id?' on':''}" onclick="setRoom('${rt.id}')">
+      <span class="room-icon">${rt.icon}</span>${rt.label}
+    </button>
+  `).join('');
+}
+function setRoom(id){curRoomType=id;buildRoomGrid();}
+
+function buildStyleScroll(){
+  document.getElementById('styleScroll').innerHTML=STYLES_ALL.map(s=>`
+    <button class="style-chip${curStyle===s?' on':''}" onclick="setStyle('${s}')">${s}</button>
+  `).join('');
+}
+function setStyle(s){curStyle=s;buildStyleScroll();}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAIN MODE
+══════════════════════════════════════════════════════════════════════════════*/
+function setMainMode(m, btn){
+  mainMode=m;
+  document.querySelectorAll('#mainModePill button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const modeRoomMap={exterior:'facade',interior:'living',moodboard:'lobby',staging:'bedroom'};
+  curRoomType=modeRoomMap[m]||'facade';
+  buildRoomGrid();
+  renderSuggestions();
+  const titles={exterior:'Camera Angles — Exterior',interior:'Camera Angles — Interior',moodboard:'Moodboard Panels',staging:'Virtual Staging Scenes'};
+  document.getElementById('canvasTitle').textContent=titles[m]||'Camera Angles';
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PROMPT
+══════════════════════════════════════════════════════════════════════════════*/
+function setPMode(m){
+  promptMode=m;
+  const ta=document.getElementById('promptTa');
+  const enhance=document.getElementById('btnEnhance');
+  document.getElementById('pmAuto').classList.toggle('on',m==='auto');
+  document.getElementById('pmCustom').classList.toggle('on',m==='custom');
+  ta.disabled=m==='auto';
+  enhance.disabled=m==='auto';
+  if(m==='custom') ta.focus();
+  else ta.placeholder='Switch to CUSTOM mode to write your own prompt…';
+}
+function onPromptInput(ta){
+  customPrompt=ta.value;
+  const l=ta.value.length;
+  const c=document.getElementById('promptCharCount');
+  c.textContent=l; c.style.color=l>700?'#ff5757':l>500?'var(--gold)':'var(--fog)';
+}
+function renderSuggestions(){
+  const suggs=MODE_SUGGESTIONS[mainMode]||[];
+  document.getElementById('promptSuggs').innerHTML=suggs.map(s=>`
+    <button class="sugg-chip" onclick="useSugg('${s.replace(/'/g,"\\'")}')">${s}</button>
+  `).join('');
+}
+function useSugg(s){
+  if(promptMode!=='custom') setPMode('custom');
+  const ta=document.getElementById('promptTa');
+  ta.value=s; customPrompt=s; onPromptInput(ta);
+}
+
+async function enhancePrompt(){
+  const raw=customPrompt.trim();
+  if(!raw){toast('Enter a prompt first','err');return;}
+  const aiKey=keys.anthropic||keys.gemini||keys.openai;
+  if(!aiKey){toast('Need Claude, Gemini or OpenAI key to enhance','err');return;}
+  const btn=document.getElementById('btnEnhance');
+  const icon=document.getElementById('enhIcon');
+  btn.disabled=true; icon.textContent='⚙';
+  try{
+    const sys=`You are an expert architectural visualization prompt engineer. Enhance the prompt for photorealistic AI rendering. Add lighting quality, materials, atmosphere, camera details. Keep under 180 words. Return ONLY the enhanced prompt.`;
+    let enhanced=null;
+    if(keys.anthropic){
+      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':keys.anthropic,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:300,system:sys,messages:[{role:'user',content:`Enhance: "${raw}"`}]})});
+      const d=await r.json(); if(r.ok) enhanced=d.content[0].text;
+    }else if(keys.gemini){
+      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${keys.gemini}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:sys+'\n\nEnhance: "'+raw+'"'}]}]})});
+      const d=await r.json(); if(r.ok) enhanced=d.candidates?.[0]?.content?.parts?.[0]?.text;
+    }else if(keys.openai){
+      const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+keys.openai},body:JSON.stringify({model:'gpt-4o-mini',max_tokens:300,messages:[{role:'system',content:sys},{role:'user',content:`Enhance: "${raw}"`}]})});
+      const d=await r.json(); if(r.ok) enhanced=d.choices[0].message.content;
+    }
+    if(enhanced){
+      const ta=document.getElementById('promptTa');
+      ta.value=enhanced.trim(); customPrompt=enhanced.trim(); onPromptInput(ta);
+      toast('✨ Prompt enhanced by AI!','ok');
+    }
+  }catch(e){toast('Enhance error: '+e.message,'err');}
+  btn.disabled=false; icon.textContent='✨';
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CAMERAS
+══════════════════════════════════════════════════════════════════════════════*/
+function buildCamGrid(){
+  const g=document.getElementById('camGrid');
+  g.innerHTML=CAMERAS.map(c=>{
+    const r=results[c.id];
+    const sel=selectedCams.has(c.id);
+    const done=r?.status==='done';
+    return`<div class="cam-card${sel?' on':''}${done?' done':''}" id="cc_${c.id}" onclick="toggleCam(${c.id})">
+      <div class="cam-sel-ring">✓</div>
+      <div class="cam-thumb">
+        ${done&&(r.url||r.b64)?`<img src="${r.url||r.b64}" alt="${c.name}">`:`<span>${c.icon}</span>`}
+        ${r?.status==='loading'?`<div class="cam-loading"><div class="spin-ring"></div><div class="cam-load-txt">RENDERING</div></div>`:''}
+        ${r?.status==='err'?`<div class="cam-err-ov">⚠</div>`:''}
+        ${done?`<div class="cam-overlay"><button class="cam-view-btn" onclick="event.stopPropagation();openLB(${c.id})">View Full</button></div>`:''}
+      </div>
+      <div class="cam-info"><div class="cam-name">${c.name}</div><div class="cam-desc">${c.desc}</div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('camMeta').textContent=`${selectedCams.size} / 14 selected`;
+  document.getElementById('genSelNum').textContent=selectedCams.size;
+}
+
+function toggleCam(id){
+  if(running) return;
+  if(selectedCams.has(id)) selectedCams.delete(id);
+  else if(selectedCams.size<14) selectedCams.add(id);
+  buildCamGrid(); updateGenBtn();
+}
+
+let allSelected=false;
+function toggleSelectAll(){
+  if(allSelected){ selectedCams.clear(); allSelected=false; }
+  else { CAMERAS.forEach(c=>selectedCams.add(c.id)); allSelected=true; }
+  buildCamGrid(); updateGenBtn();
+}
+
+function updateGenBtn(){
+  document.getElementById('btnRender').disabled=
+    (promptMode==='auto'&&!mainImage)||selectedCams.size===0||running;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SLIDERS
+══════════════════════════════════════════════════════════════════════════════*/
+function sl(el,vid){
+  const v=el.value;
+  document.getElementById(vid).textContent=v;
+  el.style.setProperty('--v',v+'%');
+  const map={'sv-light':'light','sv-mat':'mat','sv-veg':'veg','sv-atm':'atm'};
+  const k=map[vid]||vid.replace('sv-','');
+  sliderVals[k]=+v;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PROMPT BUILDER
+══════════════════════════════════════════════════════════════════════════════*/
+function buildPrompt(cam){
+  if(promptMode==='custom'&&customPrompt.trim()){
+    const refPart=refImage?', matching the aesthetic and materials from the reference image':'';
+    return`${customPrompt.trim()}, ${cam.name} camera angle, ${cam.light}${refPart}, photorealistic architectural rendering, ultra detailed, 8K quality, masterpiece`;
+  }
+  const room=ROOM_TYPES.find(r=>r.id===curRoomType);
+  const refPart=refImage?', style transfer from reference image, matching materials and atmosphere':'';
+  return`Photorealistic ${mainMode} architectural rendering, ${curStyle} design style, ${room?.label||curRoomType} space, ${cam.name} camera view, ${cam.light}, ${sliderVals.veg}% vegetation, atmosphere level ${sliderVals.atm}%, detailed materiality at ${sliderVals.mat}%, lighting intensity ${sliderVals.light}%${refPart}, professional architectural photography, 8K ultra detailed, correct proportions, masterpiece quality`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENDER ENGINE
+══════════════════════════════════════════════════════════════════════════════*/
+async function startRender(){
+  const ap=PROVIDERS.find(p=>p.id===activeProv);
+  if(!keys[ap.field]){toggleApi();toast(`Need ${ap.name} API key`,'err');return;}
+  running=true; results={}; updateGenBtn();
+  const angles=Array.from(selectedCams).map(id=>CAMERAS[id]);
+  progTotal=angles.length; progN=0;
+  document.getElementById('progFill').style.width='0%';
+  toast(`🚀 Rendering ${angles.length} angles via ${ap.name}`);
+
+  for(let i=0;i<angles.length;i++){
+    const cam=angles[i];
+    progN=i; setProgress((i/angles.length)*100);
+    results[cam.id]={status:'loading',cam};
+    buildCamGrid(); renderRPanel();
+    try{
+      // Claude/Gemini Vision analysis
+      let analysis=null;
+      if(keys.anthropic){
+        try{
+          const parts=[...(mainImage?[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:mainImage.replace(/^data:image\/\w+;base64,/,'')}}]:[]),{type:'text',text:`Analyze this architectural rendering angle "${cam.name}". Style: ${curStyle}. Mode: ${mainMode}. Room: ${curRoomType}. Give 70-word professional Vietnamese analysis of materials, lighting, atmosphere needed.`}];
+          const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':keys.anthropic,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:300,messages:[{role:'user',content:parts}]})});
+          const d=await r.json(); if(r.ok) analysis=d.content[0].text;
+        }catch{}
+      }else if(keys.gemini&&!analysis){
+        try{
+          const parts=[{text:`Analyze architectural view "${cam.name}". Style: ${curStyle}. Give 70-word analysis in Vietnamese for render guidance.`}];
+          if(mainImage) parts.unshift({inline_data:{mime_type:'image/jpeg',data:mainImage.replace(/^data:image\/\w+;base64,/,'')}});
+          const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${keys.gemini}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});
+          const d=await r.json(); if(r.ok) analysis=d.candidates?.[0]?.content?.parts?.[0]?.text;
+        }catch{}
+      }
+
+      const prompt=buildPrompt(cam);
+      let imgResult=null;
+
+      if(activeProv==='dalle3'){
+        const r=await fetch('https://api.openai.com/v1/images/generations',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+keys.openai},body:JSON.stringify({model:'dall-e-3',prompt,n:1,size:'1792x1024',quality:'hd',style:'natural'})});
+        const d=await r.json(); if(!r.ok) throw new Error(d.error?.message||'DALL-E error');
+        imgResult={url:d.data[0].url};
+
+      }else if(activeProv==='stability'){
+        const endpoint=mainImage?'https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/image-to-image':'https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image';
+        let body,hdr={'Accept':'application/json','Authorization':'Bearer '+keys.stability};
+        if(mainImage){
+          const form=new FormData();
+          const b=mainImage.replace(/^data:image\/\w+;base64,/,'');
+          const bin=atob(b);const arr=new Uint8Array(bin.length);for(let j=0;j<bin.length;j++)arr[j]=bin.charCodeAt(j);
+          form.append('init_image',new Blob([arr],{type:'image/png'}),'src.png');
+          form.append('init_image_mode','IMAGE_STRENGTH');form.append('image_strength','0.38');
+          form.append('text_prompts[0][text]',prompt);form.append('text_prompts[0][weight]','1');
+          form.append('cfg_scale','7');form.append('samples','1');form.append('steps','40');
+          body=form;
+        }else{
+          body=JSON.stringify({text_prompts:[{text:prompt,weight:1}],cfg_scale:7,width:1024,height:576,samples:1,steps:40});
+          hdr['Content-Type']='application/json';
+        }
+        const r=await fetch(endpoint,{method:'POST',headers:hdr,body});
+        const d=await r.json(); if(!r.ok) throw new Error(d.message||'Stability error');
+        imgResult={b64:`data:image/png;base64,${d.artifacts[0].base64}`};
+
+      }else if(activeProv==='replicate'){
+        const inp={prompt,negative_prompt:'blurry,distorted,low quality,cartoon,unrealistic',width:1344,height:768,num_inference_steps:40,guidance_scale:7.5};
+        if(mainImage){inp.image=mainImage;inp.prompt_strength=0.72;}
+        const cr=await fetch('https://api.replicate.com/v1/models/stability-ai/sdxl/predictions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Token '+keys.replicate},body:JSON.stringify({input:inp})});
+        let pred=await cr.json(); if(!cr.ok) throw new Error(pred.detail||'Replicate error');
+        for(let j=0;j<30;j++){
+          await new Promise(x=>setTimeout(x,2000));
+          const pr=await fetch(`https://api.replicate.com/v1/predictions/${pred.id}`,{headers:{'Authorization':'Token '+keys.replicate}});
+          pred=await pr.json();
+          if(pred.status==='succeeded'){imgResult={url:pred.output[0]};break;}
+          if(pred.status==='failed') throw new Error('Replicate failed');
+        }
+        if(!imgResult) throw new Error('Replicate timeout');
+
+      }else if(activeProv==='gemini'){
+        let done=false;
+        for(const mdl of['imagen-3.0-generate-001','imagen-3.0-fast-generate-001']){
+          if(done)break;
+          try{
+            const r=await fetch(`https://generativelanguage.googleapis.com/v1/models/${mdl}:predict?key=${keys.gemini}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({instances:[{prompt}],parameters:{sampleCount:1,aspectRatio:'16:9',personGeneration:'dont_allow',safetySetting:'BLOCK_ONLY_HIGH'}})});
+            const d=await r.json();
+            if(r.ok&&d.predictions?.[0]?.bytesBase64Encoded){imgResult={b64:`data:image/png;base64,${d.predictions[0].bytesBase64Encoded}`};done=true;}
+          }catch{}
+        }
+        if(!done){
+          const parts=[{text:`Generate photorealistic architectural image: ${prompt}. Output only the image.`}];
+          if(mainImage) parts.unshift({inline_data:{mime_type:'image/jpeg',data:mainImage.replace(/^data:image\/\w+;base64,/,'')}});
+          const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${keys.gemini}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}],generationConfig:{responseModalities:['IMAGE','TEXT']}})});
+          const d=await r.json(); if(!r.ok) throw new Error(d.error?.message||'Gemini error');
+          const imgP=d.candidates?.[0]?.content?.parts?.find(p=>p.inline_data);
+          if(!imgP) throw new Error('Gemini: account needs Imagen access');
+          imgResult={b64:`data:${imgP.inline_data.mime_type};base64,${imgP.inline_data.data}`};
+        }
+      }
+
+      results[cam.id]={status:'done',cam,url:imgResult?.url,b64:imgResult?.b64,analysis,prompt,style:curStyle,mode:mainMode};
+    }catch(e){
+      results[cam.id]={status:'err',cam,error:e.message};
+    }
+    buildCamGrid(); renderRPanel();
+  }
+
+  setProgress(100);
+  setTimeout(()=>setProgress(0),2500);
+
+  if(promptMode==='custom'&&customPrompt.trim()){
+    promptHistory=[customPrompt,...promptHistory.filter(x=>x!==customPrompt)].slice(0,8);
+    localStorage.setItem('dmpv_prompts',JSON.stringify(promptHistory));
+  }
+  const ap2=PROVIDERS.find(p=>p.id===activeProv);
+  const done=Object.values(results).filter(r=>r.status==='done').length;
+  const proj={id:Date.now(),name:`${mainMode} · ${curStyle}`,angles:angles.length,done,provider:ap2.name,date:new Date().toLocaleString('vi'),icon:angles[0].icon,style:curStyle,mode:mainMode};
+  history=[proj,...history].slice(0,30);
+  localStorage.setItem('dmpv_hist',JSON.stringify(history));
+
+  running=false; updateGenBtn();
+  toast(`✅ Done! ${done}/${angles.length} renders complete.`,'ok');
+}
+
+function setProgress(p){
+  document.getElementById('progFill').style.width=p+'%';
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESULTS PANEL
+══════════════════════════════════════════════════════════════════════════════*/
+let rTab='moodboard';
+function switchRTab(btn,tab){
+  rTab=tab;
+  document.querySelectorAll('.r-tab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  renderRPanel();
+}
+
+function renderRPanel(){
+  const body=document.getElementById('rBody');
+  const items=Object.values(results);
+
+  if(rTab==='history'){
+    if(!history.length){body.innerHTML='<div class="empty"><div class="empty-icon">📂</div><div class="empty-txt">No projects yet</div></div>';return;}
+    body.innerHTML=history.map(h=>`
+      <div class="hist-item">
+        <div class="hist-icon">${h.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div class="hist-name">${h.name}</div>
+          <div class="hist-meta">${h.angles} angles · ${h.provider} · ${h.done||0} done</div>
+        </div>
+      </div>`).join('');
+    return;
+  }
+
+  if(!items.length){
+    body.innerHTML='<div class="empty"><div class="empty-icon">🎨</div><div class="empty-txt">Select camera angles<br>and press Render Now</div></div>';
+    return;
+  }
+
+  if(rTab==='moodboard'){
+    body.innerHTML=`<div class="moodboard-grid">${items.map(r=>`
+      <div class="mood-cell" onclick="${r.status==='done'?`openLB(${r.cam.id})`:''}" title="${r.cam.name}">
+        ${r.status==='done'&&(r.url||r.b64)?`<img src="${r.url||r.b64}" alt="${r.cam.name}">`:r.status==='loading'?`<div style="display:flex;flex-direction:column;align-items:center;gap:5px"><div class="spin-ring"></div></div>`:`<span style="font-size:18px">${r.cam.icon}</span>`}
+        <div class="mood-cell-label">${r.cam.name}</div>
+        ${r.status==='done'?'<span class="mood-cell-status status-done">DONE</span>':r.status==='loading'?'<span class="mood-cell-status status-loading">···</span>':r.status==='err'?'<span class="mood-cell-status status-err">ERR</span>':''}
+      </div>`).join('')}</div>`;
+    return;
+  }
+
+  // List view
+  body.innerHTML=items.map(r=>`
+    <div class="r-item" onclick="${r.status==='done'?`openLB(${r.cam.id})`:''}" >
+      <div class="r-thumb">
+        ${r.status==='done'&&(r.url||r.b64)?`<img src="${r.url||r.b64}" alt="${r.cam.name}">`:r.status==='loading'?`<div style="display:flex;flex-direction:column;align-items:center;gap:6px;position:absolute;inset:0;align-items:center;justify-content:center;background:transparent"><div class="spin-ring"></div></div>`:`<span>${r.cam.icon}</span>`}
+      </div>
+      <div class="r-meta">
+        <span class="r-name">${r.cam.name}</span>
+        ${r.status==='done'?'<span class="tag tag-ok">DONE</span>':r.status==='loading'?'<span class="tag tag-loading">···</span>':'<span class="tag tag-err">ERR</span>'}
+      </div>
+      ${r.status==='done'?`<div class="r-actions"><button class="r-btn" onclick="event.stopPropagation();openLB(${r.cam.id})">🔍 View</button><a class="r-btn" href="${r.url||r.b64}" download="${r.cam.name}.png" onclick="event.stopPropagation()">⬇ Download</a></div>`:''}
+      ${r.status==='err'?`<div class="r-err-msg">${r.error}</div>`:''}
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LIGHTBOX
+══════════════════════════════════════════════════════════════════════════════*/
+function openLB(camId){
+  const r=results[camId]; if(!r||r.status!=='done') return;
+  document.getElementById('lbTitle').textContent=`${r.cam.name} — ${r.cam.desc}`;
+  const body=document.getElementById('lbBody');
+  body.innerHTML=`
+    ${(r.url||r.b64)?`<img class="lb-img" src="${r.url||r.b64}" alt="${r.cam.name}">`:''}
+    <div class="lb-chips">
+      <div class="lb-chip"><div class="lb-chip-l">STYLE</div><div class="lb-chip-v">${r.style||curStyle}</div></div>
+      <div class="lb-chip"><div class="lb-chip-l">MODE</div><div class="lb-chip-v">${r.mode||mainMode}</div></div>
+      <div class="lb-chip"><div class="lb-chip-l">PROVIDER</div><div class="lb-chip-v">${PROVIDERS.find(p=>p.id===activeProv)?.name}</div></div>
+    </div>
+    ${r.prompt?`<div class="lb-prompt-box">Prompt: ${r.prompt}</div>`:''}
+    ${r.analysis?`<div class="lb-analysis"><div class="lb-analysis-lbl">AI ANALYSIS</div><div class="lb-analysis-txt">${r.analysis}</div></div>`:''}
+    <div class="lb-actions">
+      <a class="lb-btn-dl" href="${r.url||r.b64}" download="${r.cam.name}-HD.png">⬇ DOWNLOAD</a>
+      <button class="lb-btn-cl" onclick="closeLB()">Close</button>
+    </div>`;
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLB(){document.getElementById('lightbox').classList.remove('open');}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOAST + UTILS
+══════════════════════════════════════════════════════════════════════════════*/
 function toast(msg,type=''){
   clearTimeout(toastTimer);
   const el=document.getElementById('toast');
@@ -371,343 +1406,9 @@ function toast(msg,type=''){
   toastTimer=setTimeout(()=>el.classList.remove('show'),3500);
 }
 
-// ── KEYS ──────────────────────────────────────────────────────────────────────
-function saveKeys(k){keys=k;localStorage.setItem('dmp_keys',JSON.stringify(k))}
-
-function toggleKeys(){
-  const p=document.getElementById('keyPanel');
-  const b=document.getElementById('btnKeys');
-  const open=p.classList.toggle('open');
-  b.classList.toggle('active',open);
-}
-
-function renderProviders(){
-  // Key panel
-  const grid=document.getElementById('keyGrid');
-  grid.innerHTML=PROVIDERS.map(p=>`
-    <div class="key-card${activeProv===p.id||keyStatus[p.id]?.valid?' active-prov':''}" id="kcard_${p.id}">
-      <div class="kc-head">
-        <div class="kc-info">
-          <div class="kc-dot" style="background:${p.color}"></div>
-          <div><div class="kc-name">${p.name}</div><div class="kc-co">${p.company}</div></div>
-        </div>
-        <div class="kc-actions">
-          ${keyStatus[p.id]?`<span class="${keyStatus[p.id].valid?'badge-ok':'badge-err'}">${keyStatus[p.id].valid?'✓':'✗'}</span>`:''}
-          ${p.id!=='anthropic'?`<button class="btn-use${activeProv===p.id?' active':''}" onclick="setProvider('${p.id}')">${activeProv===p.id?'✓ ĐANG DÙNG':'DÙNG'}</button>`:''}
-        </div>
-      </div>
-      <div class="key-row">
-        <input type="password" class="key-input" id="kinput_${p.id}" placeholder="${p.ph}" value="${keys[p.field]||''}" oninput="keys['${p.field}']=this.value;saveKeys(keys)">
-        <button class="btn-eye" onclick="toggleEye('${p.id}')">👁️</button>
-        <button class="btn-test" onclick="testKey('${p.id}')" id="ktest_${p.id}">TEST</button>
-      </div>
-      <div class="kc-note">${p.note}</div>
-      ${keyStatus[p.id]?`<div class="kc-msg ${keyStatus[p.id].valid?'ok':'err'}">${keyStatus[p.id].message}</div>`:''}
-    </div>
-  `).join('');
-  // Key footer
-  const ap=PROVIDERS.find(p=>p.id===activeProv);
-  document.getElementById('keyFooter').innerHTML=`Nền tảng đang dùng: <strong style="color:${ap.color}">${ap.name}</strong>${keys.anthropic?'<span style="margin-left:12px;color:var(--accent3);font-size:11px">✓ Claude Vision bật</span>':''}`;
-  // Left panel provider chips
-  const list=document.getElementById('provList');
-  list.innerHTML=PROVIDERS.filter(p=>p.id!=='anthropic').map(p=>`
-    <div class="prov-chip${activeProv===p.id?' active':''}" onclick="setProvider('${p.id}')">
-      <div class="prov-dot" style="background:${p.color}"></div>
-      <div style="flex:1"><div class="prov-name">${p.name}</div><div class="prov-co">${p.company}</div></div>
-      ${keyStatus[p.id]?.valid?'<span class="badge-ok">✓</span>':''}
-      ${!keys[p.field]?'<span style="font-size:10px;color:var(--accent)">!</span>':''}
-    </div>
-  `).join('');
-  // Gen bar
-  document.getElementById('genProvName').textContent=ap.name;
-  document.getElementById('genProvName').style.color=ap.color;
-}
-
-function setProvider(id){
-  activeProv=id;
-  renderProviders();
-  toast(`Dùng ${PROVIDERS.find(p=>p.id===id).name} để render`);
-}
-
-function toggleEye(id){
-  const inp=document.getElementById('kinput_'+id);
-  inp.type=inp.type==='password'?'text':'password';
-}
-
-async function testKey(id){
-  const p=PROVIDERS.find(x=>x.id===id);
-  const key=keys[p.field];
-  if(!key){toast('Nhập API key trước','err');return}
-  const btn=document.getElementById('ktest_'+id);
-  btn.textContent='···';btn.disabled=true;
-  try{
-    let valid=false,message='';
-    if(id==='anthropic'){
-      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:10,messages:[{role:'user',content:'hi'}]})});
-      const d=await r.json();valid=r.ok||d.error?.type==='invalid_request_error';message=valid?'Claude key hợp lệ ✓':(d.error?.message||'Key không hợp lệ');
-    }else if(id==='openai'){
-      const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':'Bearer '+key}});
-      valid=r.ok;message=valid?'OpenAI key hợp lệ ✓':'Key không hợp lệ';
-    }else if(id==='stability'){
-      const r=await fetch('https://api.stability.ai/v1/user/account',{headers:{'Authorization':'Bearer '+key}});
-      valid=r.ok;message=valid?'Stability AI key hợp lệ ✓':'Key không hợp lệ';
-    }else if(id==='replicate'){
-      const r=await fetch('https://api.replicate.com/v1/account',{headers:{'Authorization':'Token '+key}});
-      const d=r.ok?await r.json():{};valid=r.ok;message=valid?`Replicate: @${d.username} ✓`:'Key không hợp lệ';
-    }else if(id==='gemini'){
-      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
-      const d=await r.json();valid=r.ok&&Array.isArray(d.models);message=valid?`Gemini key hợp lệ ✓ (${d.models?.length||0} models)`:'Gemini key không hợp lệ';
-    }
-    keyStatus[id]={valid,message};
-    toast(message,valid?'ok':'err');
-    renderProviders();
-  }catch(e){toast('Lỗi kết nối: '+e.message,'err')}
-  btn.textContent='TEST';btn.disabled=false;
-}
-
-// ── UPLOAD ────────────────────────────────────────────────────────────────────
-function handleFile(inp){
-  const file=inp.files[0];if(!file)return;
-  const r=new FileReader();
-  r.onload=e=>{
-    uploadedImg=e.target.result;
-    document.getElementById('previewImg').src=uploadedImg;
-    document.getElementById('previewBox').style.display='block';
-    document.getElementById('uploadZone').style.display='none';
-    updateGenBtn();toast('✓ Ảnh mô hình đã tải lên');
-  };r.readAsDataURL(file);
-}
-
-function clearImage(){
-  uploadedImg=null;results={};
-  document.getElementById('previewBox').style.display='none';
-  document.getElementById('uploadZone').style.display='block';
-  document.getElementById('fileInput').value='';
-  updateGenBtn();renderResults();
-}
-
-// ── STYLES / ENVS ─────────────────────────────────────────────────────────────
-function renderStyles(){
-  document.getElementById('styleGrid').innerHTML=STYLES.map(s=>`<button class="style-btn${curStyle===s?' active':''}" onclick="setStyle('${s}')">${s}</button>`).join('');
-}
-function setStyle(s){curStyle=s;renderStyles()}
-
-function renderEnvs(){
-  document.getElementById('envGrid').innerHTML=ENVS.map(e=>`<button class="style-btn${curEnv===e?' active':''}" onclick="setEnv('${e}')">${e}</button>`).join('');
-}
-function setEnv(e){curEnv=e;renderEnvs()}
-
-function updateSlider(el,valId,unit){
-  const v=el.value;
-  document.getElementById(valId).textContent=v+unit;
-  el.style.setProperty('--v',v+'%');
-  sliders[{lightVal:'light',matVal:'mat',vegVal:'veg'}[valId]]=+v;
-}
-
-// ── CAMERAS ───────────────────────────────────────────────────────────────────
-function renderCameras(){
-  const grid=document.getElementById('camGrid');
-  grid.innerHTML=CAMERAS.map(cam=>{
-    const r=results[cam.id];
-    const sel=selectedCams.has(cam.id);
-    const done=r?.status==='done';
-    return`<div class="cam-card${sel?' sel':''}${done?' done':''}" id="camcard_${cam.id}" onclick="toggleCam(${cam.id})">
-      <div class="cam-check">✓</div>
-      <div class="cam-thumb">
-        ${done&&(r.url||r.b64)?`<img src="${r.url||r.b64}" alt="${cam.name}">`:`<span>${cam.icon}</span>`}
-        ${r?.status==='loading'?`<div class="cam-loading"><div class="cam-spinner"></div><div class="cam-load-txt">RENDERING</div></div>`:''}
-        ${r?.status==='err'?`<div class="cam-err">⚠️</div>`:''}
-        ${done?`<button class="cam-view-btn" onclick="event.stopPropagation();openModal(${cam.id})">🔍 Xem</button>`:''}
-      </div>
-      <div class="cam-info"><div class="cam-name">${cam.name}</div><div class="cam-desc">${cam.desc}</div></div>
-    </div>`;
-  }).join('');
-  document.getElementById('camCount').textContent=`${selectedCams.size} / 14 đã chọn`;
-  document.getElementById('selCount').textContent=selectedCams.size;
-}
-
-function toggleCam(id){
-  if(running)return;
-  if(selectedCams.has(id))selectedCams.delete(id);
-  else if(selectedCams.size<14)selectedCams.add(id);
-  renderCameras();updateGenBtn();
-}
-
-function updateGenBtn(){
-  document.getElementById('btnGen').disabled=!uploadedImg||selectedCams.size===0||running;
-}
-
-// ── GENERATE ──────────────────────────────────────────────────────────────────
-function buildPrompt(cam){
-  return`Photorealistic architectural rendering, ${curStyle} style architecture, ${cam.name} camera angle, ${cam.light}, ${curEnv} environment, professional architectural visualization, ultra detailed, correct proportions, high quality materials, ${sliders.veg}% vegetation, masterpiece quality`;
-}
-
-async function startGenerate(){
-  const ap=PROVIDERS.find(p=>p.id===activeProv);
-  if(!keys[ap.field]){
-    toggleKeys();toast(`Cần nhập ${ap.name} API key`,'err');return;
-  }
-  running=true;results={};updateGenBtn();
-  const angles=Array.from(selectedCams).map(id=>CAMERAS[id]);
-  document.getElementById('progressWrap').style.display='flex';
-  toast(`🚀 Render ${angles.length} góc với ${ap.name}`);
-
-  for(let i=0;i<angles.length;i++){
-    const cam=angles[i];
-    document.getElementById('progressFill').style.width=`${((i)/angles.length)*100}%`;
-    document.getElementById('progressTxt').textContent=`RENDERING ${i+1}/${angles.length}`;
-    results[cam.id]={status:'loading',cam};
-    renderCameras();renderResults();
-    try{
-      let analysis=null;
-      // Claude analysis if key set
-      if(keys.anthropic){
-        try{
-          const msgs=[{role:'user',content:keys.anthropic?[
-            ...(uploadedImg?[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:uploadedImg.replace(/^data:image\/\w+;base64,/,'')}}]:[]),
-            {type:'text',text:`Phân tích góc nhìn "${cam.name}": ${cam.desc}. Lighting: ${cam.light}. Phong cách: ${curStyle}, môi trường: ${curEnv}. Gợi ý vật liệu, ánh sáng, bố cục ngắn gọn 80 từ tiếng Việt.`}
-          ]:`Phân tích góc kiến trúc ${cam.name} cho render ${curStyle}, ${curEnv}. 60 từ.`}];
-          const ar=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':keys.anthropic,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:400,messages:msgs})});
-          const ad=await ar.json();
-          if(ar.ok)analysis=ad.content[0].text;
-        }catch{}
-      }
-      // Gemini Vision analysis fallback if no Claude key but Gemini key set
-      if(!analysis&&keys.gemini){
-        try{
-          const parts=[{text:`Phân tích góc nhìn kiến trúc "${cam.name}": ${cam.desc}. Lighting: ${cam.light}. Phong cách: ${curStyle}, môi trường: ${curEnv}. Gợi ý vật liệu, bố cục, ánh sáng. 80 từ tiếng Việt.`}];
-          if(uploadedImg){const b64=uploadedImg.replace(/^data:image\/\w+;base64,/,'');parts.unshift({inline_data:{mime_type:'image/jpeg',data:b64}});}
-          const gr=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${keys.gemini}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});
-          const gd=await gr.json();
-          if(gr.ok)analysis=gd.candidates?.[0]?.content?.parts?.[0]?.text||null;
-        }catch{}
-      }
-      // Image generation
-      let imgResult=null;
-      const prompt=buildPrompt(cam);
-      if(activeProv==='dalle3'){
-        const r=await fetch('https://api.openai.com/v1/images/generations',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+keys.openai},body:JSON.stringify({model:'dall-e-3',prompt,n:1,size:'1792x1024',quality:'hd',style:'natural'})});
-        const d=await r.json();
-        if(!r.ok)throw new Error(d.error?.message||'DALL-E error');
-        imgResult={url:d.data[0].url};
-      }else if(activeProv==='stability'){
-        const form=new FormData();
-        if(uploadedImg){
-          const b64=uploadedImg.replace(/^data:image\/\w+;base64,/,'');
-          const bytes=atob(b64);const arr=new Uint8Array(bytes.length);
-          for(let j=0;j<bytes.length;j++)arr[j]=bytes.charCodeAt(j);
-          form.append('init_image',new Blob([arr],{type:'image/png'}),'model.png');
-          form.append('init_image_mode','IMAGE_STRENGTH');form.append('image_strength','0.35');
-        }
-        form.append('text_prompts[0][text]',prompt);form.append('text_prompts[0][weight]','1');
-        form.append('cfg_scale','7');form.append('samples','1');form.append('steps','40');
-        const endpoint=uploadedImg?'https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/image-to-image':'https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image';
-        const r=await fetch(endpoint,{method:'POST',headers:{'Accept':'application/json','Authorization':'Bearer '+keys.stability},body:uploadedImg?form:JSON.stringify({text_prompts:[{text:prompt,weight:1}],cfg_scale:7,width:1024,height:576,samples:1,steps:40}),...(!uploadedImg?{'Content-Type':'application/json'}:{})});
-        const d=await r.json();
-        if(!r.ok)throw new Error(d.message||'Stability error');
-        imgResult={b64:`data:image/png;base64,${d.artifacts[0].base64}`};
-      }else if(activeProv==='replicate'){
-        const inp={prompt,negative_prompt:'blurry,distorted,low quality,cartoon',width:1344,height:768,num_inference_steps:40,guidance_scale:7.5};
-        if(uploadedImg){inp.image=uploadedImg;inp.prompt_strength=0.7;}
-        const cr=await fetch('https://api.replicate.com/v1/models/stability-ai/sdxl/predictions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Token '+keys.replicate},body:JSON.stringify({input:inp})});
-        let pred=await cr.json();if(!cr.ok)throw new Error(pred.detail||'Replicate error');
-        for(let j=0;j<30;j++){
-          await new Promise(r=>setTimeout(r,2000));
-          const pr=await fetch(`https://api.replicate.com/v1/predictions/${pred.id}`,{headers:{'Authorization':'Token '+keys.replicate}});
-          pred=await pr.json();
-          if(pred.status==='succeeded'){imgResult={url:pred.output[0]};break;}
-          if(pred.status==='failed')throw new Error('Replicate failed');
-        }
-        if(!imgResult)throw new Error('Replicate timeout');
-      }else if(activeProv==='gemini'){
-        // Gemini Imagen 3 via REST
-        const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${keys.gemini}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({instances:[{prompt}],parameters:{sampleCount:1,aspectRatio:'16:9',personGeneration:'dont_allow',safetySetting:'block_only_high'}})});
-        const d=await r.json();
-        if(!r.ok)throw new Error(d.error?.message||'Gemini Imagen error');
-        const b64data=d.predictions?.[0]?.bytesBase64Encoded;
-        if(!b64data)throw new Error('Gemini: không nhận được ảnh');
-        imgResult={b64:`data:image/png;base64,${b64data}`};
-      }
-      results[cam.id]={status:'done',cam,url:imgResult?.url,b64:imgResult?.b64,analysis};
-    }catch(e){
-      results[cam.id]={status:'err',cam,error:e.message};
-    }
-    renderCameras();renderResults();
-  }
-
-  document.getElementById('progressFill').style.width='100%';
-  document.getElementById('progressTxt').textContent=`DONE ${angles.length}/${angles.length}`;
-  setTimeout(()=>document.getElementById('progressWrap').style.display='none',2000);
-
-  const ap2=PROVIDERS.find(p=>p.id===activeProv);
-  const proj={id:Date.now(),name:`Dự án ${new Date().toLocaleDateString('vi')}`,angles:angles.length,style:curStyle,provider:ap2.name,date:new Date().toLocaleString('vi'),icon:angles[0].icon};
-  history=[proj,...history].slice(0,30);
-  localStorage.setItem('dmp_hist',JSON.stringify(history));
-  renderHistory();
-  running=false;updateGenBtn();
-  toast(`✅ Hoàn tất ${angles.length} góc diễn họa!`,'ok');
-}
-
-// ── RESULTS ───────────────────────────────────────────────────────────────────
-function renderResults(){
-  const list=document.getElementById('resultsList');
-  const items=Object.values(results);
-  if(!items.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">🎨</div><p style="font-size:11px;line-height:1.6">Chọn góc nhìn và nhấn Diễn Họa AI</p></div>';return;}
-  list.innerHTML=items.map(r=>`
-    <div class="r-item" onclick="${r.status==='done'?`openModal(${r.cam.id})`:''}">
-      <div class="r-thumb">
-        ${r.status==='done'&&(r.url||r.b64)?`<img src="${r.url||r.b64}" alt="${r.cam.name}">`
-          :r.status==='loading'?`<span style="font-family:'DM Mono';font-size:9px;color:var(--accent)">RENDERING...</span>`
-          :r.status==='err'?'⚠️':`<span>${r.cam.icon}</span>`}
-      </div>
-      <div class="r-meta">
-        <span class="r-name">${r.cam.name}</span>
-        ${r.status==='done'?'<span class="tag-ok">DONE</span>':r.status==='loading'?'<span class="tag-loading">···</span>':'<span class="tag-err">ERR</span>'}
-      </div>
-      ${r.status==='done'?`<div class="r-actions"><button class="r-btn" onclick="event.stopPropagation();openModal(${r.cam.id})">🔍 Xem</button><a class="r-btn" href="${r.url||r.b64}" download="${r.cam.name}.png" onclick="event.stopPropagation()">⬇️ Tải</a></div>`:''}
-      ${r.status==='err'?`<div class="r-err">${r.error}</div>`:''}
-    </div>
-  `).join('');
-}
-
-// ── HISTORY ───────────────────────────────────────────────────────────────────
-function renderHistory(){
-  const list=document.getElementById('historyList');
-  if(!history.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">📂</div><p style="font-size:11px">Chưa có dự án</p></div>';return;}
-  list.innerHTML=history.map(h=>`
-    <div class="hist-item">
-      <div class="hist-thumb">${h.icon}</div>
-      <div style="flex:1;min-width:0">
-        <div class="hist-name">${h.name}</div>
-        <div class="hist-meta">${h.angles} góc · ${h.style} · ${h.provider}</div>
-      </div>
-    </div>
-  `).join('');
-}
-
-function switchTab(btn,tab){
-  document.querySelectorAll('.r-tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('resultsList').style.display=tab==='results'?'block':'none';
-  document.getElementById('historyList').style.display=tab==='history'?'block':'none';
-}
-
-// ── MODAL ─────────────────────────────────────────────────────────────────────
-function openModal(camId){
-  const r=results[camId];if(!r||r.status!=='done')return;
-  currentModal=r;
-  document.getElementById('modalTitle').textContent=`${r.cam.name} — ${r.cam.desc}`.toUpperCase();
-  document.getElementById('modalImgWrap').innerHTML=(r.url||r.b64)?`<img class="modal-img" src="${r.url||r.b64}" alt="${r.cam.name}">`:'' ;
-  document.getElementById('modalInfo').innerHTML=[['PHONG CÁCH',curStyle],['MÔI TRƯỜNG',curEnv],['PROVIDER',PROVIDERS.find(p=>p.id===activeProv)?.name]].map(([l,v])=>`<div class="info-chip"><div class="info-lbl">${l}</div><div class="info-val">${v}</div></div>`).join('');
-  if(r.analysis){document.getElementById('modalAnalysis').style.display='block';document.getElementById('modalAnalysisTxt').textContent=r.analysis;}
-  else document.getElementById('modalAnalysis').style.display='none';
-  document.getElementById('modalActions').innerHTML=`<a class="btn-primary" href="${r.url||r.b64}" download="${r.cam.name}-4K.png">⬇️ TẢI XUỐNG</a><button class="btn-secondary" onclick="closeModal()">Đóng</button>`;
-  document.getElementById('modalOverlay').classList.add('open');
-}
-
-function closeModal(){document.getElementById('modalOverlay').classList.remove('open')}
-
-// ── START ─────────────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════════════════════════════════════════*/
 init();
 </script>
 </body>
