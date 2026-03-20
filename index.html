@@ -42,7 +42,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
 #keyPanel{display:none;border-bottom:1px solid var(--border);background:var(--surface);padding:16px 24px;position:relative;z-index:99}
 #keyPanel.open{display:block}
 .key-note{font-size:11px;color:var(--muted);background:rgba(78,205,196,.06);border:1px solid rgba(78,205,196,.15);border-radius:4px;padding:7px 12px;margin-bottom:12px}
-.key-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.key-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
 .key-card{border:1px solid var(--border);border-radius:6px;padding:12px;background:var(--panel)}
 .key-card.active-prov{border-color:var(--accent)}
 .kc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
@@ -342,6 +342,7 @@ const PROVIDERS=[
   {id:'dalle3',name:'DALL·E 3',company:'OpenAI',color:'#10a37f',field:'openai',ph:'sk-...',note:'HD 1792×1024 · style natural'},
   {id:'stability',name:'Stable XL',company:'Stability AI',color:'#7c3aed',field:'stability',ph:'sk-...',note:'img2img · 1024×576'},
   {id:'replicate',name:'SDXL',company:'Replicate',color:'#ef4444',field:'replicate',ph:'r8_...',note:'1344×768 · async polling'},
+  {id:'gemini',name:'Imagen 3',company:'Google Gemini',color:'#4285f4',field:'gemini',ph:'AIza...',note:'Imagen 3 · Vision phân tích'},
   {id:'anthropic',name:'Claude Vision',company:'Anthropic',color:'#c8a96e',field:'anthropic',ph:'sk-ant-...',note:'Phân tích & tạo prompt AI'},
 ];
 
@@ -453,6 +454,9 @@ async function testKey(id){
     }else if(id==='replicate'){
       const r=await fetch('https://api.replicate.com/v1/account',{headers:{'Authorization':'Token '+key}});
       const d=r.ok?await r.json():{};valid=r.ok;message=valid?`Replicate: @${d.username} ✓`:'Key không hợp lệ';
+    }else if(id==='gemini'){
+      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+      const d=await r.json();valid=r.ok&&Array.isArray(d.models);message=valid?`Gemini key hợp lệ ✓ (${d.models?.length||0} models)`:'Gemini key không hợp lệ';
     }
     keyStatus[id]={valid,message};
     toast(message,valid?'ok':'err');
@@ -568,6 +572,16 @@ async function startGenerate(){
           if(ar.ok)analysis=ad.content[0].text;
         }catch{}
       }
+      // Gemini Vision analysis fallback if no Claude key but Gemini key set
+      if(!analysis&&keys.gemini){
+        try{
+          const parts=[{text:`Phân tích góc nhìn kiến trúc "${cam.name}": ${cam.desc}. Lighting: ${cam.light}. Phong cách: ${curStyle}, môi trường: ${curEnv}. Gợi ý vật liệu, bố cục, ánh sáng. 80 từ tiếng Việt.`}];
+          if(uploadedImg){const b64=uploadedImg.replace(/^data:image\/\w+;base64,/,'');parts.unshift({inline_data:{mime_type:'image/jpeg',data:b64}});}
+          const gr=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${keys.gemini}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts}]})});
+          const gd=await gr.json();
+          if(gr.ok)analysis=gd.candidates?.[0]?.content?.parts?.[0]?.text||null;
+        }catch{}
+      }
       // Image generation
       let imgResult=null;
       const prompt=buildPrompt(cam);
@@ -605,6 +619,14 @@ async function startGenerate(){
           if(pred.status==='failed')throw new Error('Replicate failed');
         }
         if(!imgResult)throw new Error('Replicate timeout');
+      }else if(activeProv==='gemini'){
+        // Gemini Imagen 3 via REST
+        const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${keys.gemini}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({instances:[{prompt}],parameters:{sampleCount:1,aspectRatio:'16:9',personGeneration:'dont_allow',safetySetting:'block_only_high'}})});
+        const d=await r.json();
+        if(!r.ok)throw new Error(d.error?.message||'Gemini Imagen error');
+        const b64data=d.predictions?.[0]?.bytesBase64Encoded;
+        if(!b64data)throw new Error('Gemini: không nhận được ảnh');
+        imgResult={b64:`data:image/png;base64,${b64data}`};
       }
       results[cam.id]={status:'done',cam,url:imgResult?.url,b64:imgResult?.b64,analysis};
     }catch(e){
