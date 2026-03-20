@@ -355,6 +355,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
   </div>
   <div class="hdr-right">
     <div class="live-badge"><div class="live-dot"></div>STUDIO ONLINE</div>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">&#9680;</button>
     <button class="btn-sm" id="btnApi" onclick="toggleApi()">&#9881; API KEYS</button>
     <button class="btn-auth" id="btnAuth" onclick="openAuth()">
       <span id="authBtnTxt">&#128100; Đăng nhập</span>
@@ -463,6 +464,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
         <span class="prompt-cc" id="promptCC">0</span>
       </div>
       <div class="sugg-row" id="suggRow"></div>
+      <div id="promptHistSection" style="display:none"><div class="hist-pr-label">RECENT PROMPTS</div><div class="hist-prompts" id="promptHistChips"></div></div>
     </div>
     <div class="canvas-hd">
       <span class="canvas-title" id="canvasTitle">Select Camera Angles</span>
@@ -471,6 +473,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
         <button class="btn-all" onclick="toggleAll()">SELECT ALL</button>
       </div>
     </div>
+    <div class="stats-bar" id="statsBar"><span class="stat-item">&#128247; <span class="stat-val" id="statDone">0</span> rendered</span><span class="stat-item">&#9889; <span class="stat-val" id="statErr">0</span> errors</span><span class="stat-item">&#128336; <span class="stat-val" id="statTime">0s</span></span><span style="margin-left:auto;font-size:8px">&#9003; Space to select all &nbsp;|&nbsp; R to render</span></div>
     <div class="prog-wrap"><div class="prog-fill" id="progFill"></div></div>
     <div class="cam-grid" id="camGrid"></div>
     <div class="gen-bar">
@@ -493,6 +496,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
       <button class="r-tab" onclick="setRTab(this,'hist')">History</button>
       <button class="r-tab" onclick="setRTab(this,'cloud')">&#9729; Cloud</button>
     </div>
+    <div class="result-actions-bar" id="resultActionsBar" style="display:none">
+      <button class="btn-retry" id="btnRetry" onclick="retryErrors()">&#8635; Retry Errors</button>
+      <button class="btn-dl-all" onclick="downloadAll()">&#8681; Download All</button>
+    </div>
     <div class="r-body" id="rBody">
       <div class="empty"><div class="empty-icon">&#127912;</div><div class="empty-txt">Select camera angles<br>and press Render Now</div></div>
     </div>
@@ -510,7 +517,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
   </div>
 </div>
 
-<div class="toast" id="toast"><div class="toast-dot"></div><span id="toastMsg"></span></div>
+<div class="toast" id="toast" style="padding-bottom:13px"><div class="toast-dot"></div><span id="toastMsg"></span><div class="toast-prog"><div class="toast-prog-fill" id="toastProg" style="width:100%"></div></div></div>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════
@@ -614,8 +621,10 @@ function init(){
     var us=JSON.parse(localStorage.getItem('dmpv_user')||'null');
     if(us&&us.id)setUser(us);
   }catch(e){}
+  applyTheme(curTheme);
   buildApiGrid();buildRooms();buildStyles();buildCams();buildProvs();
   updateBtn();renderSuggs();renderRight();
+  renderPromptHistory();
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -976,6 +985,7 @@ function setPMode(m){
   ta.disabled=(m==='auto');
   document.getElementById('btnEnh').disabled=(m==='auto');
   if(m==='custom')ta.focus();
+  renderPromptHistory();
 }
 function onPromptInput(ta){
   customPr=ta.value;
@@ -1042,6 +1052,7 @@ function buildCams(){
   document.getElementById('camGrid').innerHTML=html;
   document.getElementById('camMeta').textContent=selCams.size+' / 14 selected';
   document.getElementById('genN').textContent=selCams.size;
+  if(typeof updateStats==='function') updateStats();
 }
 
 function toggleCam(id){if(running)return;if(selCams.has(id))selCams.delete(id);else if(selCams.size<14)selCams.add(id);buildCams();updateBtn();}
@@ -1070,16 +1081,17 @@ async function startRender(){
   var ap=PROVS.find(function(p){return p.id===activeProv;});
   if(!keys[ap.field]){toggleApi();toast('Need '+ap.name+' API key','err');return;}
   if(!checkRL('gen')){toast('Rate limit: max 20 renders/min','err');return;}
-  running=true;results={};updateBtn();
+  running=true;results={};renderStartTime=Date.now();updateBtn();updateStats();
   var angles=[];selCams.forEach(function(id){var c=CAMS.find(function(x){return x.id===id;});if(c)angles.push(c);});
   document.getElementById('progFill').style.width='0%';
+  statsTimer=setInterval(updateStats,500);
   toast('\ud83d\ude80 Rendering '+angles.length+' angles via '+ap.name);
 
   for(var i=0;i<angles.length;i++){
     var cam=angles[i];
     document.getElementById('progFill').style.width=((i/angles.length)*100)+'%';
     results[cam.id]={status:'loading',cam:cam};
-    buildCams();renderRight();
+    buildCams();renderRight();updateStats();
 
     try{
       // 1. Analysis via proxy
@@ -1120,9 +1132,12 @@ async function startRender(){
   if(pMode==='custom'&&customPr.trim()){
     prHistory=[customPr].concat(prHistory.filter(function(x){return x!==customPr;})).slice(0,8);
     localStorage.setItem('dmpv_p',JSON.stringify(prHistory));
+    renderPromptHistory();
   }
   running=false;updateBtn();
-  toast('\u2705 Done! '+doneCnt+'/'+angles.length+' renders complete.','ok');
+  if(statsTimer){clearInterval(statsTimer);statsTimer=null;}
+  updateStats();
+  toast('\u2705 Done! '+doneCnt+'/'+angles.length+' renders complete in '+((Date.now()-renderStartTime)/1000).toFixed(1)+'s','ok',5000);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1254,6 +1269,170 @@ function toast(msg,type){
   el.className='toast show'+(type?' '+type:'');
   toastTmr=setTimeout(function(){el.classList.remove('show');},3500);
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════
+   THEME TOGGLE
+═══════════════════════════════════════════════════════════════════ */
+var curTheme = localStorage.getItem('dmpv_theme') || 'dark';
+function applyTheme(t) {
+  curTheme = t;
+  document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : '');
+  var btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = t === 'light' ? '☀' : '☾';
+  localStorage.setItem('dmpv_theme', t);
+}
+function toggleTheme() { applyTheme(curTheme === 'dark' ? 'light' : 'dark'); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   PROMPT HISTORY UI
+═══════════════════════════════════════════════════════════════════ */
+function renderPromptHistory() {
+  var sec = document.getElementById('promptHistSection');
+  var chips = document.getElementById('promptHistChips');
+  if (!sec || !chips) return;
+  if (!prHistory.length || pMode !== 'custom') { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  var html = '';
+  for (var i = 0; i < prHistory.length; i++) {
+    var p = prHistory[i];
+    var short = p.length > 45 ? p.slice(0, 45) + '…' : p;
+    html += '<button class="hist-pr-chip" title="' + p.replace(/"/g, '&quot;') + '" onclick="loadHistPrompt(' + i + ')">' + short + '</button>';
+  }
+  chips.innerHTML = html;
+}
+function loadHistPrompt(i) {
+  var p = prHistory[i]; if (!p) return;
+  var ta = document.getElementById('promptTa');
+  ta.value = p; customPr = p; onPromptInput(ta);
+  toast('Prompt loaded from history');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   STATS BAR
+═══════════════════════════════════════════════════════════════════ */
+var renderStartTime = 0;
+var statsTimer = null;
+function updateStats() {
+  var items = Object.values(results);
+  var done = items.filter(function(r) { return r.status === 'done'; }).length;
+  var errs = items.filter(function(r) { return r.status === 'err'; }).length;
+  var el1 = document.getElementById('statDone');
+  var el2 = document.getElementById('statErr');
+  var el3 = document.getElementById('statTime');
+  if (el1) el1.textContent = done;
+  if (el2) { el2.textContent = errs; el2.style.color = errs > 0 ? 'var(--danger)' : 'var(--gold)'; }
+  if (el3 && renderStartTime) el3.textContent = ((Date.now() - renderStartTime) / 1000).toFixed(1) + 's';
+  // Show retry/dl-all bar
+  var bar = document.getElementById('resultActionsBar');
+  if (bar) bar.style.display = items.length > 0 ? 'flex' : 'none';
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RETRY ERRORS
+═══════════════════════════════════════════════════════════════════ */
+async function retryErrors() {
+  var errCams = Object.values(results).filter(function(r) { return r.status === 'err'; }).map(function(r) { return r.cam; });
+  if (!errCams.length) { toast('No errors to retry', 'ok'); return; }
+  var ap = PROVS.find(function(p) { return p.id === activeProv; });
+  if (!keys[ap.field]) { toast('Need ' + ap.name + ' API key', 'err'); return; }
+  running = true; updateBtn();
+  toast('↻ Retrying ' + errCams.length + ' failed renders…');
+  for (var i = 0; i < errCams.length; i++) {
+    var cam = errCams[i];
+    results[cam.id] = { status: 'loading', cam: cam };
+    buildCams(); renderRight(); updateStats();
+    try {
+      var analysis = null;
+      if (keys.anthropic || keys.gemini) {
+        try {
+          var ap2 = { action: 'analyze', prompt: 'Analyze architectural angle "' + cam.name + '". Style: ' + curStyle + '. Mode: ' + curMode + '. Room: ' + curRoom + '. 70-word Vietnamese analysis.', apiKeys: { anthropic: keys.anthropic || '', gemini: keys.gemini || '' }, sessionToken: SESSION_ID };
+          if (srcImg) ap2.imageBase64 = srcImg;
+          var ar = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(ap2) });
+          var ad = await ar.json();
+          if (ar.ok && ad.analysis) analysis = ad.analysis;
+        } catch(e2) {}
+      }
+      var prompt = buildPrompt(cam);
+      var gp = { action: 'generate', provider: activeProv, prompt: prompt, apiKeys: { openai: keys.openai || '', stability: keys.stability || '', replicate: keys.replicate || '', gemini: keys.gemini || '', anthropic: keys.anthropic || '' }, sessionToken: SESSION_ID };
+      if (srcImg && (activeProv === 'stability' || activeProv === 'replicate' || activeProv === 'gemini')) gp.imageBase64 = srcImg;
+      var gr = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(gp) });
+      var gd = await gr.json();
+      if (!gr.ok) throw new Error(gd.error || 'Generation failed');
+      results[cam.id] = { status: 'done', cam: cam, url: gd.url, b64: gd.base64, analysis: analysis, prompt: prompt, style: curStyle, mode: curMode };
+    } catch(e) {
+      results[cam.id] = { status: 'err', cam: cam, error: e.message };
+    }
+    buildCams(); renderRight(); updateStats();
+  }
+  running = false; updateBtn();
+  var nowDone = Object.values(results).filter(function(r) { return r.status === 'done'; }).length;
+  toast('✅ Retry complete: ' + nowDone + '/' + Object.keys(results).length + ' done', 'ok');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DOWNLOAD ALL AS ZIP (uses browser-native approach)
+═══════════════════════════════════════════════════════════════════ */
+async function downloadAll() {
+  var done = Object.values(results).filter(function(r) { return r.status === 'done' && (r.url || r.b64); });
+  if (!done.length) { toast('No renders to download', 'err'); return; }
+  toast('↓ Downloading ' + done.length + ' images…');
+  // Download each image individually with delay
+  for (var i = 0; i < done.length; i++) {
+    var r = done[i];
+    var src = r.b64 || r.url;
+    var a = document.createElement('a');
+    a.href = src;
+    a.download = (r.cam.name || 'render') + '_' + curStyle + '_' + curMode + '.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    await new Promise(function(res) { setTimeout(res, 400); }); // stagger downloads
+  }
+  toast('✅ Downloaded ' + done.length + ' images', 'ok');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   KEYBOARD SHORTCUTS
+═══════════════════════════════════════════════════════════════════ */
+document.addEventListener('keydown', function(e) {
+  // Don't fire when typing in input/textarea
+  var tag = e.target.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  // Space = toggle select all cameras
+  if (e.code === 'Space') { e.preventDefault(); toggleAll(); }
+  // R = start render
+  if (e.code === 'KeyR' && !running) { e.preventDefault(); if (!document.getElementById('btnRender').disabled) startRender(); }
+  // Escape = close lightbox / auth
+  if (e.code === 'Escape') { closeLB(); closeAuth(); }
+  // T = toggle theme
+  if (e.code === 'KeyT') { toggleTheme(); }
+  // C = focus custom prompt
+  if (e.code === 'KeyC') { setPMode('custom'); document.getElementById('promptTa').focus(); }
+});
+
+/* ═══════════════════════════════════════════════════════════════════
+   ENHANCED TOAST (with auto-dismiss progress bar)
+═══════════════════════════════════════════════════════════════════ */
+function toast(msg, type, duration) {
+  clearTimeout(toastTmr);
+  duration = duration || 3500;
+  var el = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  el.className = 'toast show' + (type ? ' ' + type : '');
+  // Animate progress bar
+  var prog = document.getElementById('toastProg');
+  if (prog) {
+    prog.style.transition = 'none';
+    prog.style.width = '100%';
+    setTimeout(function() {
+      prog.style.transition = 'width ' + (duration / 1000) + 's linear';
+      prog.style.width = '0%';
+    }, 50);
+  }
+  toastTmr = setTimeout(function() { el.classList.remove('show'); }, duration);
+}
+
 
 /* ═══════════════════════════════════════════════════════════════════
    BOOT
