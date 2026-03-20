@@ -1,37 +1,17 @@
 # 🏗️ DMP AI Architectural Rendering Pro
 
-AI diễn họa kiến trúc — chuyển ảnh 3D thô thành render chất lượng cao.
+Pure static HTML — **zero build step**. Deploy in 60 seconds.
 
-## Stack
-- Next.js 14 (App Router)
-- DALL·E 3 / Stable Diffusion XL / Replicate SDXL
-- Claude Vision (phân tích & tạo prompt)
-- Vercel + GitHub Actions CI/CD
+## Tại sao static?
+Next.js yêu cầu build step và đường dẫn cụ thể. File HTML này chạy trực tiếp không cần build.
 
-## Cấu trúc
-```
-app/                          ← Next.js App Router (ở ROOT)
-  layout.js
-  page.js
-  globals.css
-  api/generate/route.js       ← DALL-E / Stability / Replicate
-  api/validate-key/route.js   ← kiểm tra API key
-.github/workflows/deploy.yml  ← CI/CD
-next.config.js
-package.json
-vercel.json
-```
+## Deploy Vercel (60 giây)
 
-## Deploy lên Vercel qua GitHub
+### Cách 1 — Kéo thả (nhanh nhất)
+1. Vào [vercel.com/new](https://vercel.com/new)
+2. Kéo thả thư mục này vào → Deploy xong!
 
-### Bước 1 – Giải nén đúng cách
-```bash
-unzip dmp-render-pro.zip -d myproject
-cd myproject
-ls    # phải thấy: app/  next.config.js  package.json
-```
-
-### Bước 2 – Push GitHub
+### Cách 2 — GitHub + Auto CI/CD
 ```bash
 git init
 git add .
@@ -39,40 +19,29 @@ git commit -m "init: DMP AI Render Pro"
 git remote add origin https://github.com/YOUR_USER/dmp-render.git
 git push -u origin main
 ```
+Vào vercel.com → Import repo → **Framework: Other** → Deploy
 
-### Bước 3 – Import Vercel
-- Vào vercel.com → Add New Project → Import repo
-- **Root Directory: để TRỐNG** (không điền gì)
-- Framework: Next.js (tự detect)
-- Nhấn Deploy
+Sau đó thêm GitHub Secret `VERCEL_TOKEN` để CI/CD tự động.
 
-### Bước 4 – Environment Variables (Vercel Dashboard → Settings → Env Vars)
-```
-ANTHROPIC_API_KEY = sk-ant-...
-OPENAI_API_KEY    = sk-...
-STABILITY_API_KEY = sk-...
-REPLICATE_API_KEY = r8_...
-```
-
-### Bước 5 – GitHub Actions CI/CD (tự động deploy khi push)
-GitHub repo → Settings → Secrets → Actions:
-- VERCEL_TOKEN      (vercel.com → Account → Tokens)
-- VERCEL_ORG_ID     (chạy `vercel link`, xem .vercel/project.json)
-- VERCEL_PROJECT_ID (như trên)
-
-## Chạy local
+## Chạy local (không cần npm)
 ```bash
-npm install
-cp .env.example .env.local
-# điền API keys vào .env.local
-npm run dev
-# mở http://localhost:3000
+# Chỉ cần mở file
+open index.html
+# hoặc dùng server đơn giản
+npx serve .
+python3 -m http.server 3000
 ```
 
-## Lấy API Keys
-| Provider | URL |
-|----------|-----|
-| OpenAI (DALL·E 3) | platform.openai.com/api-keys |
+## API Keys
+Nhập trực tiếp trong app (lưu localStorage) hoặc hardcode vào index.html.
+
+| Provider | Lấy key tại |
+|----------|-------------|
+| OpenAI DALL·E 3 | platform.openai.com/api-keys |
 | Stability AI | platform.stability.ai/account/keys |
-| Replicate | replicate.com/account/api-tokens |
-| Anthropic | console.anthropic.com/keys |
+| Replicate SDXL | replicate.com/account/api-tokens |
+| Anthropic Claude | console.anthropic.com/keys |
+
+## Lưu ý CORS
+Một số provider (Stability AI, Replicate) không cho phép gọi API trực tiếp từ browser do CORS.
+Nếu gặp lỗi CORS, dùng DALL·E 3 (OpenAI hỗ trợ CORS) hoặc deploy proxy đơn giản.

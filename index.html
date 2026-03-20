@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DMP AI Architectural Rendering Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0a0c; --surface:#111116; --panel:#16161d; --border:#2a2a38;
+  --accent:#c8a96e; --accent2:#7b9cff; --accent3:#4ecdc4;
+  --text:#e8e6e0; --muted:#6b6b7e; --danger:#ff5757;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:.2;pointer-events:none;z-index:0}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+input,button,select,textarea{font-family:'Outfit',sans-serif}
+a{color:inherit;text-decoration:none}
+
+/* HEADER */
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;border-bottom:1px solid var(--border);background:rgba(10,10,12,.96);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-hex{width:38px;height:38px;background:linear-gradient(135deg,#c8a96e,#a07840);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:13px;color:#0a0a0c}
+.logo-name{font-family:'Bebas Neue';font-size:20px;letter-spacing:3px;color:var(--accent)}
+.logo-sub{font-size:8px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:-3px}
+.header-mid{flex:1;padding:0 32px}
+.progress-wrap{display:flex;align-items:center;gap:12px}
+.progress-bar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(to right,var(--accent),var(--accent3));border-radius:2px;width:0%;transition:width .4s}
+.progress-txt{font-family:'DM Mono';font-size:10px;color:var(--accent);white-space:nowrap}
+.header-right{display:flex;align-items:center;gap:12px}
+.status{display:flex;align-items:center;gap:6px;font-family:'DM Mono';font-size:10px;color:var(--accent3);letter-spacing:1px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--accent3);box-shadow:0 0 8px var(--accent3);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.btn-keys{padding:6px 14px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;letter-spacing:.5px;transition:all .2s}
+.btn-keys:hover,.btn-keys.active{border-color:var(--accent);color:var(--accent);background:rgba(200,169,110,.08)}
+
+/* KEY PANEL */
+#keyPanel{display:none;border-bottom:1px solid var(--border);background:var(--surface);padding:16px 24px;position:relative;z-index:99}
+#keyPanel.open{display:block}
+.key-note{font-size:11px;color:var(--muted);background:rgba(78,205,196,.06);border:1px solid rgba(78,205,196,.15);border-radius:4px;padding:7px 12px;margin-bottom:12px}
+.key-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.key-card{border:1px solid var(--border);border-radius:6px;padding:12px;background:var(--panel)}
+.key-card.active-prov{border-color:var(--accent)}
+.kc-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.kc-info{display:flex;gap:8px;align-items:center}
+.kc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:2px}
+.kc-name{font-size:11px;font-weight:600;color:var(--text)}
+.kc-co{font-size:9px;color:var(--muted)}
+.kc-actions{display:flex;gap:5px;align-items:center}
+.badge-ok{background:rgba(78,205,196,.15);color:var(--accent3);font-family:'DM Mono';font-size:9px;padding:2px 7px;border-radius:3px}
+.badge-err{background:rgba(255,87,87,.15);color:var(--danger);font-family:'DM Mono';font-size:9px;padding:2px 7px;border-radius:3px}
+.btn-use{padding:2px 8px;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--muted);font-size:9px;font-weight:700;cursor:pointer;letter-spacing:1px;font-family:'DM Mono';transition:all .2s}
+.btn-use:hover{border-color:var(--accent2);color:var(--accent2)}
+.btn-use.active{border-color:var(--accent)!important;color:var(--accent)!important;background:rgba(200,169,110,.1)!important}
+.key-row{display:flex;gap:5px;margin-bottom:5px}
+.key-input{flex:1;padding:7px 10px;background:var(--surface);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'DM Mono';font-size:11px;outline:none;transition:border-color .2s}
+.key-input:focus{border-color:var(--accent)}
+.btn-eye,.btn-test{padding:0 8px;border:1px solid var(--border);border-radius:3px;background:transparent;cursor:pointer;transition:all .2s;font-size:12px}
+.btn-test{color:var(--muted);font-family:'DM Mono';font-size:10px;font-weight:600}
+.btn-test:hover{border-color:var(--accent2);color:var(--accent2)}
+.kc-note{font-size:10px;color:var(--muted)}
+.kc-msg{font-size:10px;margin-top:5px;padding:4px 8px;border-radius:3px}
+.kc-msg.ok{background:rgba(78,205,196,.1);color:var(--accent3)}
+.kc-msg.err{background:rgba(255,87,87,.1);color:var(--danger)}
+.key-footer{margin-top:10px;font-size:12px;color:var(--muted)}
+
+/* MAIN LAYOUT */
+.main{display:grid;grid-template-columns:290px 1fr 250px;height:calc(100vh - 62px);position:relative;z-index:1}
+
+/* LEFT */
+.left{border-right:1px solid var(--border);background:var(--surface);overflow-y:auto}
+.sec{padding:14px;border-bottom:1px solid var(--border)}
+.sec-label{font-family:'DM Mono';font-size:9px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:10px}
+.upload-zone{border:1.5px dashed var(--border);border-radius:6px;padding:24px 12px;text-align:center;cursor:pointer;background:rgba(200,169,110,.02);transition:all .3s}
+.upload-zone:hover{border-color:var(--accent);background:rgba(200,169,110,.06)}
+.preview-box{position:relative;border-radius:6px;overflow:hidden;aspect-ratio:16/10;display:none}
+.preview-box img{width:100%;height:100%;object-fit:cover}
+.preview-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);display:flex;align-items:flex-end;justify-content:space-between;padding:8px 10px}
+.prov-list{display:flex;flex-direction:column;gap:6px}
+.prov-chip{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:4px;background:var(--panel);cursor:pointer;transition:all .2s;position:relative}
+.prov-chip:hover{border-color:var(--muted)}
+.prov-chip.active{border-color:var(--accent);background:rgba(200,169,110,.06)}
+.prov-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.prov-name{font-size:11px;font-weight:600;color:var(--text)}
+.prov-co{font-size:9px;color:var(--muted)}
+.style-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.style-btn{padding:7px 4px;border:1px solid var(--border);border-radius:4px;background:var(--panel);color:var(--muted);font-size:11px;font-weight:500;cursor:pointer;transition:all .2s}
+.style-btn:hover,.style-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(200,169,110,.08)}
+.slider-row{margin-bottom:11px}
+.slider-hd{display:flex;justify-content:space-between;margin-bottom:5px}
+.slider-lbl{font-size:11px;color:var(--text);font-weight:500}
+.slider-val{font-family:'DM Mono';font-size:11px;color:var(--accent)}
+input[type=range]{width:100%;height:3px;-webkit-appearance:none;background:linear-gradient(to right,var(--accent) var(--v,70%),var(--border) var(--v,70%));border-radius:2px;cursor:pointer;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(200,169,110,.5);border:2px solid var(--bg)}
+
+/* CENTER */
+.center{display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.center-top{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);flex-shrink:0}
+.cam-grid{flex:1;overflow-y:auto;padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:9px;align-content:start}
+.cam-card{border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--surface);cursor:pointer;position:relative;transition:all .25s}
+.cam-card:hover{border-color:var(--muted);transform:translateY(-1px)}
+.cam-card.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.cam-card.done{border-color:var(--accent3)}
+.cam-check{position:absolute;top:7px;right:7px;width:18px;height:18px;border-radius:50%;background:var(--accent);color:var(--bg);font-size:9px;font-weight:bold;display:none;align-items:center;justify-content:center;z-index:2}
+.cam-card.sel .cam-check{display:flex}
+.cam-thumb{aspect-ratio:16/9;background:var(--panel);display:flex;align-items:center;justify-content:center;font-size:22px;position:relative;overflow:hidden}
+.cam-thumb img{width:100%;height:100%;object-fit:cover}
+.cam-loading{position:absolute;inset:0;background:rgba(10,10,12,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.cam-spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cam-load-txt{font-family:'DM Mono';font-size:8px;color:var(--accent);letter-spacing:1px}
+.cam-err{position:absolute;inset:0;background:rgba(255,87,87,.12);display:flex;align-items:center;justify-content:center}
+.cam-view-btn{position:absolute;inset:0;background:rgba(0,0,0,.55);border:none;color:white;font-size:12px;cursor:pointer;opacity:0;transition:opacity .2s;display:flex;align-items:center;justify-content:center}
+.cam-thumb:hover .cam-view-btn{opacity:1}
+.cam-info{padding:7px 9px}
+.cam-name{font-size:10px;font-weight:600;color:var(--text)}
+.cam-desc{font-size:9px;color:var(--muted);margin-top:1px}
+.gen-bar{padding:11px 18px;border-top:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.gen-count{font-family:'DM Mono';font-size:13px;color:var(--text)}
+.gen-count strong{color:var(--accent);font-size:16px}
+.gen-prov{font-size:10px;color:var(--muted)}
+.btn-gen{flex:1;padding:12px;background:linear-gradient(135deg,var(--accent),#a07840);border:none;border-radius:5px;font-family:'Bebas Neue';font-size:17px;letter-spacing:2px;color:var(--bg);cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.btn-gen:hover:not(:disabled){box-shadow:0 0 20px rgba(200,169,110,.4)}
+.btn-gen:disabled{opacity:.5;cursor:not-allowed;background:var(--border);color:var(--muted)}
+
+/* RIGHT */
+.right{border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden}
+.r-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.r-tab{flex:1;padding:10px 0;text-align:center;font-size:10px;font-weight:700;letter-spacing:1px;cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);transition:all .2s}
+.r-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.r-list{flex:1;overflow-y:auto}
+.empty-state{padding:32px 16px;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:10px}
+.empty-icon{font-size:36px;opacity:.4}
+.r-item{padding:10px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s}
+.r-item:hover{background:rgba(200,169,110,.04)}
+.r-thumb{width:100%;aspect-ratio:16/9;border-radius:4px;overflow:hidden;background:var(--panel);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:7px;position:relative}
+.r-thumb img{width:100%;height:100%;object-fit:cover}
+.r-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.r-name{font-size:11px;font-weight:600;color:var(--text)}
+.tag-ok{background:rgba(78,205,196,.15);color:var(--accent3);font-family:'DM Mono';font-size:9px;padding:2px 7px;border-radius:3px}
+.tag-loading{background:rgba(123,156,255,.15);color:var(--accent2);font-family:'DM Mono';font-size:9px;padding:2px 7px;border-radius:3px}
+.tag-err{background:rgba(255,87,87,.15);color:var(--danger);font-family:'DM Mono';font-size:9px;padding:2px 7px;border-radius:3px}
+.r-actions{display:flex;gap:5px}
+.r-btn{flex:1;padding:5px 0;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--muted);font-size:10px;cursor:pointer;transition:all .2s;text-align:center;display:block}
+.r-btn:hover{border-color:var(--accent2);color:var(--accent2)}
+.r-err{font-size:10px;color:var(--danger);margin-top:3px}
+.hist-item{padding:9px 12px;border-bottom:1px solid var(--border);display:flex;gap:9px;align-items:center}
+.hist-thumb{width:36px;height:26px;border-radius:3px;background:var(--panel);display:flex;align-items:center;justify-content:center;font-size:13px;border:1px solid var(--border);flex-shrink:0}
+.hist-name{font-size:11px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-meta{font-size:9px;color:var(--muted);margin-top:1px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:8px;width:90%;max-width:820px;max-height:90vh;overflow-y:auto}
+.modal-hd{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-family:'Bebas Neue';font-size:18px;letter-spacing:2px;color:var(--accent)}
+.modal-close{padding:4px 10px;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--muted);cursor:pointer;font-size:12px;transition:all .2s}
+.modal-close:hover{border-color:var(--danger);color:var(--danger)}
+.modal-body{padding:20px}
+.modal-img{width:100%;border-radius:6px;margin-bottom:14px;border:1px solid var(--border)}
+.modal-info{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:14px}
+.info-chip{padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:4px}
+.info-lbl{font-family:'DM Mono';font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:3px}
+.info-val{font-size:13px;font-weight:600;color:var(--text)}
+.modal-analysis{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:4px;padding:14px;margin-bottom:14px}
+.analysis-lbl{font-family:'DM Mono';font-size:9px;color:var(--accent);letter-spacing:2px;margin-bottom:8px}
+.analysis-txt{font-size:12px;line-height:1.7;color:var(--text)}
+.modal-actions{display:flex;gap:10px}
+.btn-primary{flex:1;padding:11px;background:linear-gradient(135deg,var(--accent),#a07840);border:none;border-radius:4px;font-family:'Bebas Neue';font-size:16px;letter-spacing:1px;color:var(--bg);cursor:pointer;text-align:center;display:block}
+.btn-secondary{padding:11px 20px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:13px;cursor:pointer;transition:all .2s}
+.btn-secondary:hover{border-color:var(--accent2);color:var(--accent2)}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--panel);border:1px solid var(--accent);border-radius:6px;padding:10px 16px;font-size:12px;z-index:9999;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.4);transform:translateY(60px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.err{border-color:var(--danger)}
+.toast.ok{border-color:var(--accent3)}
+.toast-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.toast.err .toast-dot{background:var(--danger)}
+.toast.ok .toast-dot{background:var(--accent3)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-hex">DMP</div>
+    <div>
+      <div class="logo-name">DMP AI RENDER</div>
+      <div class="logo-sub">ARCHITECTURAL RENDERING PRO</div>
+    </div>
+  </div>
+  <div class="header-mid">
+    <div class="progress-wrap" id="progressWrap" style="display:none">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <span class="progress-txt" id="progressTxt"></span>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status"><div class="status-dot"></div>AI ENGINE ONLINE</div>
+    <button class="btn-keys" id="btnKeys" onclick="toggleKeys()">🔑 API KEYS</button>
+  </div>
+</header>
+
+<!-- KEY PANEL -->
+<div id="keyPanel">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <span style="font-family:'DM Mono';font-size:9px;letter-spacing:2px;color:var(--accent);text-transform:uppercase">Quản lý API Keys</span>
+    <button onclick="toggleKeys()" style="padding:4px 10px;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--muted);cursor:pointer;font-size:12px">✕ Đóng</button>
+  </div>
+  <div class="key-note">🔒 Keys lưu trong localStorage của trình duyệt — không gửi đến server khi không render. Keys có thể set qua Vercel Environment Variables để dùng server-side.</div>
+  <div class="key-grid" id="keyGrid"></div>
+  <div class="key-footer" id="keyFooter"></div>
+</div>
+
+<div class="main">
+  <!-- LEFT -->
+  <div class="left">
+    <div class="sec">
+      <div class="sec-label">Tải mô hình 3D</div>
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(this)">
+        <div style="font-size:28px;margin-bottom:8px">🏗️</div>
+        <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:3px">Kéo thả hoặc nhấn để tải</div>
+        <div style="font-size:10px;color:var(--muted)">PNG · JPG · WEBP</div>
+      </div>
+      <div class="preview-box" id="previewBox">
+        <img id="previewImg" src="" alt="model">
+        <div class="preview-ov">
+          <span style="font-family:'DM Mono';font-size:9px;color:var(--accent);letter-spacing:1px">MÔ HÌNH GỐC ✓</span>
+          <button onclick="clearImage()" style="font-size:10px;color:var(--muted);background:rgba(0,0,0,.5);border:1px solid var(--border);border-radius:3px;padding:2px 8px;cursor:pointer">Đổi ảnh</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">Nền tảng AI render</div>
+      <div class="prov-list" id="provList"></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">Phong cách kiến trúc</div>
+      <div class="style-grid" id="styleGrid"></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">Thông số</div>
+      <div class="slider-row">
+        <div class="slider-hd"><span class="slider-lbl">Ánh sáng</span><span class="slider-val" id="lightVal">70%</span></div>
+        <input type="range" min="0" max="100" value="70" style="--v:70%" oninput="updateSlider(this,'lightVal','%')">
+      </div>
+      <div class="slider-row">
+        <div class="slider-hd"><span class="slider-lbl">Vật liệu</span><span class="slider-val" id="matVal">85%</span></div>
+        <input type="range" min="0" max="100" value="85" style="--v:85%" oninput="updateSlider(this,'matVal','%')">
+      </div>
+      <div class="slider-row">
+        <div class="slider-hd"><span class="slider-lbl">Thực vật</span><span class="slider-val" id="vegVal">60%</span></div>
+        <input type="range" min="0" max="100" value="60" style="--v:60%" oninput="updateSlider(this,'vegVal','%')">
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">Môi trường</div>
+      <div class="style-grid" id="envGrid"></div>
+    </div>
+  </div>
+
+  <!-- CENTER -->
+  <div class="center">
+    <div class="center-top">
+      <span style="font-family:'Bebas Neue';font-size:18px;letter-spacing:2px;color:var(--text)">CHỌN GÓC NHÌN CAMERA</span>
+      <span style="font-family:'DM Mono';font-size:11px;color:var(--muted)" id="camCount">0 / 14 đã chọn</span>
+    </div>
+    <div class="cam-grid" id="camGrid"></div>
+    <div class="gen-bar">
+      <div>
+        <div class="gen-count"><strong id="selCount">0</strong> góc</div>
+        <div class="gen-prov">via <strong id="genProvName" style="color:#10a37f">DALL·E 3</strong></div>
+      </div>
+      <button class="btn-gen" id="btnGen" disabled onclick="startGenerate()">⚡ DIỄN HỌA AI</button>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="r-tabs">
+      <button class="r-tab active" onclick="switchTab(this,'results')">KẾT QUẢ</button>
+      <button class="r-tab" onclick="switchTab(this,'history')">LỊCH SỬ</button>
+    </div>
+    <div class="r-list" id="resultsList">
+      <div class="empty-state"><div class="empty-icon">🎨</div><p style="font-size:11px;line-height:1.6">Chọn góc nhìn và nhấn Diễn Họa AI</p></div>
+    </div>
+    <div class="r-list" id="historyList" style="display:none"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-hd">
+      <span class="modal-title" id="modalTitle">KẾT QUẢ</span>
+      <button class="modal-close" onclick="closeModal()">✕ Đóng</button>
+    </div>
+    <div class="modal-body">
+      <div id="modalImgWrap"></div>
+      <div class="modal-info" id="modalInfo"></div>
+      <div class="modal-analysis" id="modalAnalysis" style="display:none">
+        <div class="analysis-lbl">AI ANALYSIS</div>
+        <div class="analysis-txt" id="modalAnalysisTxt"></div>
+      </div>
+      <div class="modal-actions" id="modalActions"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><div class="toast-dot"></div><span id="toastMsg"></span></div>
+
+<script>
+const CAMERAS=[
+  {id:0,name:'Mặt Chính',desc:'Toàn bộ công trình',icon:'🏗️',light:'bright natural daylight, sharp shadows'},
+  {id:1,name:'Góc Chéo 45°',desc:'Phối cảnh kết hợp',icon:'📐',light:'natural daylight, perspective view'},
+  {id:2,name:'Góc Thấp',desc:'Tăng chiều cao ấn tượng',icon:'⬇️',light:'low angle shot, dramatic sky'},
+  {id:3,name:'Toàn Cảnh',desc:'Nhìn từ trên cao',icon:'🔭',light:'aerial bird eye view'},
+  {id:4,name:'Cận Vật Liệu',desc:'Chi tiết texture',icon:'🔍',light:'close-up macro detail'},
+  {id:5,name:'Không Gian',desc:'Bối cảnh tổng thể',icon:'🌐',light:'wide angle expansive context'},
+  {id:6,name:'Ban Ngày',desc:'Ánh sáng tự nhiên',icon:'☀️',light:'midday sun high key lighting'},
+  {id:7,name:'Chiều Tà',desc:'Ánh vàng buổi chiều',icon:'🌅',light:'warm golden afternoon light, long shadows'},
+  {id:8,name:'Hoàng Hôn',desc:'Sky gradient đặc sắc',icon:'🌇',light:'dramatic sunset orange-pink sky, god rays'},
+  {id:9,name:'Ban Đêm',desc:'Chiếu sáng kiến trúc',icon:'🌃',light:'night scene architectural lighting illuminated windows'},
+  {id:10,name:'Nội Thất',desc:'Không gian chính',icon:'🛋️',light:'interior photography warm ambient lighting'},
+  {id:11,name:'Lối Di Chuyển',desc:'Tiếp cận công trình',icon:'🚶',light:'pedestrian level entrance approach'},
+  {id:12,name:'Người + Tỷ Lệ',desc:'Cảnh quan sinh động',icon:'👥',light:'human figures for scale lively scene'},
+  {id:13,name:'Marketing',desc:'Góc nghệ thuật nhất',icon:'✨',light:'cinematic composition dramatic hero shot'},
+];
+
+const PROVIDERS=[
+  {id:'dalle3',name:'DALL·E 3',company:'OpenAI',color:'#10a37f',field:'openai',ph:'sk-...',note:'HD 1792×1024 · style natural'},
+  {id:'stability',name:'Stable XL',company:'Stability AI',color:'#7c3aed',field:'stability',ph:'sk-...',note:'img2img · 1024×576'},
+  {id:'replicate',name:'SDXL',company:'Replicate',color:'#ef4444',field:'replicate',ph:'r8_...',note:'1344×768 · async polling'},
+  {id:'anthropic',name:'Claude Vision',company:'Anthropic',color:'#c8a96e',field:'anthropic',ph:'sk-ant-...',note:'Phân tích & tạo prompt AI'},
+];
+
+const STYLES=['Hiện đại','Cổ điển','Tối giản','Tropical','Industrial','Luxury'];
+const ENVS=['Đô thị','Biển','Núi','Ngoại ô'];
+
+let keys={}, keyStatus={}, activeProv='dalle3';
+let uploadedImg=null, selectedCams=new Set(), curStyle='Hiện đại', curEnv='Đô thị';
+let sliders={light:70,mat:85,veg:60};
+let results={}, running=false, history=[];
+let toastTimer, currentModal=null;
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+function init(){
+  try{keys=JSON.parse(localStorage.getItem('dmp_keys')||'{}')}catch{}
+  try{history=JSON.parse(localStorage.getItem('dmp_hist')||'[]')}catch{}
+  renderProviders(); renderStyles(); renderEnvs(); renderCameras(); renderHistory();
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function toast(msg,type=''){
+  clearTimeout(toastTimer);
+  const el=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  el.className='toast show'+(type?' '+type:'');
+  toastTimer=setTimeout(()=>el.classList.remove('show'),3500);
+}
+
+// ── KEYS ──────────────────────────────────────────────────────────────────────
+function saveKeys(k){keys=k;localStorage.setItem('dmp_keys',JSON.stringify(k))}
+
+function toggleKeys(){
+  const p=document.getElementById('keyPanel');
+  const b=document.getElementById('btnKeys');
+  const open=p.classList.toggle('open');
+  b.classList.toggle('active',open);
+}
+
+function renderProviders(){
+  // Key panel
+  const grid=document.getElementById('keyGrid');
+  grid.innerHTML=PROVIDERS.map(p=>`
+    <div class="key-card${activeProv===p.id||keyStatus[p.id]?.valid?' active-prov':''}" id="kcard_${p.id}">
+      <div class="kc-head">
+        <div class="kc-info">
+          <div class="kc-dot" style="background:${p.color}"></div>
+          <div><div class="kc-name">${p.name}</div><div class="kc-co">${p.company}</div></div>
+        </div>
+        <div class="kc-actions">
+          ${keyStatus[p.id]?`<span class="${keyStatus[p.id].valid?'badge-ok':'badge-err'}">${keyStatus[p.id].valid?'✓':'✗'}</span>`:''}
+          ${p.id!=='anthropic'?`<button class="btn-use${activeProv===p.id?' active':''}" onclick="setProvider('${p.id}')">${activeProv===p.id?'✓ ĐANG DÙNG':'DÙNG'}</button>`:''}
+        </div>
+      </div>
+      <div class="key-row">
+        <input type="password" class="key-input" id="kinput_${p.id}" placeholder="${p.ph}" value="${keys[p.field]||''}" oninput="keys['${p.field}']=this.value;saveKeys(keys)">
+        <button class="btn-eye" onclick="toggleEye('${p.id}')">👁️</button>
+        <button class="btn-test" onclick="testKey('${p.id}')" id="ktest_${p.id}">TEST</button>
+      </div>
+      <div class="kc-note">${p.note}</div>
+      ${keyStatus[p.id]?`<div class="kc-msg ${keyStatus[p.id].valid?'ok':'err'}">${keyStatus[p.id].message}</div>`:''}
+    </div>
+  `).join('');
+  // Key footer
+  const ap=PROVIDERS.find(p=>p.id===activeProv);
+  document.getElementById('keyFooter').innerHTML=`Nền tảng đang dùng: <strong style="color:${ap.color}">${ap.name}</strong>${keys.anthropic?'<span style="margin-left:12px;color:var(--accent3);font-size:11px">✓ Claude Vision bật</span>':''}`;
+  // Left panel provider chips
+  const list=document.getElementById('provList');
+  list.innerHTML=PROVIDERS.filter(p=>p.id!=='anthropic').map(p=>`
+    <div class="prov-chip${activeProv===p.id?' active':''}" onclick="setProvider('${p.id}')">
+      <div class="prov-dot" style="background:${p.color}"></div>
+      <div style="flex:1"><div class="prov-name">${p.name}</div><div class="prov-co">${p.company}</div></div>
+      ${keyStatus[p.id]?.valid?'<span class="badge-ok">✓</span>':''}
+      ${!keys[p.field]?'<span style="font-size:10px;color:var(--accent)">!</span>':''}
+    </div>
+  `).join('');
+  // Gen bar
+  document.getElementById('genProvName').textContent=ap.name;
+  document.getElementById('genProvName').style.color=ap.color;
+}
+
+function setProvider(id){
+  activeProv=id;
+  renderProviders();
+  toast(`Dùng ${PROVIDERS.find(p=>p.id===id).name} để render`);
+}
+
+function toggleEye(id){
+  const inp=document.getElementById('kinput_'+id);
+  inp.type=inp.type==='password'?'text':'password';
+}
+
+async function testKey(id){
+  const p=PROVIDERS.find(x=>x.id===id);
+  const key=keys[p.field];
+  if(!key){toast('Nhập API key trước','err');return}
+  const btn=document.getElementById('ktest_'+id);
+  btn.textContent='···';btn.disabled=true;
+  try{
+    let valid=false,message='';
+    if(id==='anthropic'){
+      const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:10,messages:[{role:'user',content:'hi'}]})});
+      const d=await r.json();valid=r.ok||d.error?.type==='invalid_request_error';message=valid?'Claude key hợp lệ ✓':(d.error?.message||'Key không hợp lệ');
+    }else if(id==='openai'){
+      const r=await fetch('https://api.openai.com/v1/models',{headers:{'Authorization':'Bearer '+key}});
+      valid=r.ok;message=valid?'OpenAI key hợp lệ ✓':'Key không hợp lệ';
+    }else if(id==='stability'){
+      const r=await fetch('https://api.stability.ai/v1/user/account',{headers:{'Authorization':'Bearer '+key}});
+      valid=r.ok;message=valid?'Stability AI key hợp lệ ✓':'Key không hợp lệ';
+    }else if(id==='replicate'){
+      const r=await fetch('https://api.replicate.com/v1/account',{headers:{'Authorization':'Token '+key}});
+      const d=r.ok?await r.json():{};valid=r.ok;message=valid?`Replicate: @${d.username} ✓`:'Key không hợp lệ';
+    }
+    keyStatus[id]={valid,message};
+    toast(message,valid?'ok':'err');
+    renderProviders();
+  }catch(e){toast('Lỗi kết nối: '+e.message,'err')}
+  btn.textContent='TEST';btn.disabled=false;
+}
+
+// ── UPLOAD ────────────────────────────────────────────────────────────────────
+function handleFile(inp){
+  const file=inp.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    uploadedImg=e.target.result;
+    document.getElementById('previewImg').src=uploadedImg;
+    document.getElementById('previewBox').style.display='block';
+    document.getElementById('uploadZone').style.display='none';
+    updateGenBtn();toast('✓ Ảnh mô hình đã tải lên');
+  };r.readAsDataURL(file);
+}
+
+function clearImage(){
+  uploadedImg=null;results={};
+  document.getElementById('previewBox').style.display='none';
+  document.getElementById('uploadZone').style.display='block';
+  document.getElementById('fileInput').value='';
+  updateGenBtn();renderResults();
+}
+
+// ── STYLES / ENVS ─────────────────────────────────────────────────────────────
+function renderStyles(){
+  document.getElementById('styleGrid').innerHTML=STYLES.map(s=>`<button class="style-btn${curStyle===s?' active':''}" onclick="setStyle('${s}')">${s}</button>`).join('');
+}
+function setStyle(s){curStyle=s;renderStyles()}
+
+function renderEnvs(){
+  document.getElementById('envGrid').innerHTML=ENVS.map(e=>`<button class="style-btn${curEnv===e?' active':''}" onclick="setEnv('${e}')">${e}</button>`).join('');
+}
+function setEnv(e){curEnv=e;renderEnvs()}
+
+function updateSlider(el,valId,unit){
+  const v=el.value;
+  document.getElementById(valId).textContent=v+unit;
+  el.style.setProperty('--v',v+'%');
+  sliders[{lightVal:'light',matVal:'mat',vegVal:'veg'}[valId]]=+v;
+}
+
+// ── CAMERAS ───────────────────────────────────────────────────────────────────
+function renderCameras(){
+  const grid=document.getElementById('camGrid');
+  grid.innerHTML=CAMERAS.map(cam=>{
+    const r=results[cam.id];
+    const sel=selectedCams.has(cam.id);
+    const done=r?.status==='done';
+    return`<div class="cam-card${sel?' sel':''}${done?' done':''}" id="camcard_${cam.id}" onclick="toggleCam(${cam.id})">
+      <div class="cam-check">✓</div>
+      <div class="cam-thumb">
+        ${done&&(r.url||r.b64)?`<img src="${r.url||r.b64}" alt="${cam.name}">`:`<span>${cam.icon}</span>`}
+        ${r?.status==='loading'?`<div class="cam-loading"><div class="cam-spinner"></div><div class="cam-load-txt">RENDERING</div></div>`:''}
+        ${r?.status==='err'?`<div class="cam-err">⚠️</div>`:''}
+        ${done?`<button class="cam-view-btn" onclick="event.stopPropagation();openModal(${cam.id})">🔍 Xem</button>`:''}
+      </div>
+      <div class="cam-info"><div class="cam-name">${cam.name}</div><div class="cam-desc">${cam.desc}</div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('camCount').textContent=`${selectedCams.size} / 14 đã chọn`;
+  document.getElementById('selCount').textContent=selectedCams.size;
+}
+
+function toggleCam(id){
+  if(running)return;
+  if(selectedCams.has(id))selectedCams.delete(id);
+  else if(selectedCams.size<14)selectedCams.add(id);
+  renderCameras();updateGenBtn();
+}
+
+function updateGenBtn(){
+  document.getElementById('btnGen').disabled=!uploadedImg||selectedCams.size===0||running;
+}
+
+// ── GENERATE ──────────────────────────────────────────────────────────────────
+function buildPrompt(cam){
+  return`Photorealistic architectural rendering, ${curStyle} style architecture, ${cam.name} camera angle, ${cam.light}, ${curEnv} environment, professional architectural visualization, ultra detailed, correct proportions, high quality materials, ${sliders.veg}% vegetation, masterpiece quality`;
+}
+
+async function startGenerate(){
+  const ap=PROVIDERS.find(p=>p.id===activeProv);
+  if(!keys[ap.field]){
+    toggleKeys();toast(`Cần nhập ${ap.name} API key`,'err');return;
+  }
+  running=true;results={};updateGenBtn();
+  const angles=Array.from(selectedCams).map(id=>CAMERAS[id]);
+  document.getElementById('progressWrap').style.display='flex';
+  toast(`🚀 Render ${angles.length} góc với ${ap.name}`);
+
+  for(let i=0;i<angles.length;i++){
+    const cam=angles[i];
+    document.getElementById('progressFill').style.width=`${((i)/angles.length)*100}%`;
+    document.getElementById('progressTxt').textContent=`RENDERING ${i+1}/${angles.length}`;
+    results[cam.id]={status:'loading',cam};
+    renderCameras();renderResults();
+    try{
+      let analysis=null;
+      // Claude analysis if key set
+      if(keys.anthropic){
+        try{
+          const msgs=[{role:'user',content:keys.anthropic?[
+            ...(uploadedImg?[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:uploadedImg.replace(/^data:image\/\w+;base64,/,'')}}]:[]),
+            {type:'text',text:`Phân tích góc nhìn "${cam.name}": ${cam.desc}. Lighting: ${cam.light}. Phong cách: ${curStyle}, môi trường: ${curEnv}. Gợi ý vật liệu, ánh sáng, bố cục ngắn gọn 80 từ tiếng Việt.`}
+          ]:`Phân tích góc kiến trúc ${cam.name} cho render ${curStyle}, ${curEnv}. 60 từ.`}];
+          const ar=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':keys.anthropic,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:400,messages:msgs})});
+          const ad=await ar.json();
+          if(ar.ok)analysis=ad.content[0].text;
+        }catch{}
+      }
+      // Image generation
+      let imgResult=null;
+      const prompt=buildPrompt(cam);
+      if(activeProv==='dalle3'){
+        const r=await fetch('https://api.openai.com/v1/images/generations',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+keys.openai},body:JSON.stringify({model:'dall-e-3',prompt,n:1,size:'1792x1024',quality:'hd',style:'natural'})});
+        const d=await r.json();
+        if(!r.ok)throw new Error(d.error?.message||'DALL-E error');
+        imgResult={url:d.data[0].url};
+      }else if(activeProv==='stability'){
+        const form=new FormData();
+        if(uploadedImg){
+          const b64=uploadedImg.replace(/^data:image\/\w+;base64,/,'');
+          const bytes=atob(b64);const arr=new Uint8Array(bytes.length);
+          for(let j=0;j<bytes.length;j++)arr[j]=bytes.charCodeAt(j);
+          form.append('init_image',new Blob([arr],{type:'image/png'}),'model.png');
+          form.append('init_image_mode','IMAGE_STRENGTH');form.append('image_strength','0.35');
+        }
+        form.append('text_prompts[0][text]',prompt);form.append('text_prompts[0][weight]','1');
+        form.append('cfg_scale','7');form.append('samples','1');form.append('steps','40');
+        const endpoint=uploadedImg?'https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/image-to-image':'https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image';
+        const r=await fetch(endpoint,{method:'POST',headers:{'Accept':'application/json','Authorization':'Bearer '+keys.stability},body:uploadedImg?form:JSON.stringify({text_prompts:[{text:prompt,weight:1}],cfg_scale:7,width:1024,height:576,samples:1,steps:40}),...(!uploadedImg?{'Content-Type':'application/json'}:{})});
+        const d=await r.json();
+        if(!r.ok)throw new Error(d.message||'Stability error');
+        imgResult={b64:`data:image/png;base64,${d.artifacts[0].base64}`};
+      }else if(activeProv==='replicate'){
+        const inp={prompt,negative_prompt:'blurry,distorted,low quality,cartoon',width:1344,height:768,num_inference_steps:40,guidance_scale:7.5};
+        if(uploadedImg){inp.image=uploadedImg;inp.prompt_strength=0.7;}
+        const cr=await fetch('https://api.replicate.com/v1/models/stability-ai/sdxl/predictions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Token '+keys.replicate},body:JSON.stringify({input:inp})});
+        let pred=await cr.json();if(!cr.ok)throw new Error(pred.detail||'Replicate error');
+        for(let j=0;j<30;j++){
+          await new Promise(r=>setTimeout(r,2000));
+          const pr=await fetch(`https://api.replicate.com/v1/predictions/${pred.id}`,{headers:{'Authorization':'Token '+keys.replicate}});
+          pred=await pr.json();
+          if(pred.status==='succeeded'){imgResult={url:pred.output[0]};break;}
+          if(pred.status==='failed')throw new Error('Replicate failed');
+        }
+        if(!imgResult)throw new Error('Replicate timeout');
+      }
+      results[cam.id]={status:'done',cam,url:imgResult?.url,b64:imgResult?.b64,analysis};
+    }catch(e){
+      results[cam.id]={status:'err',cam,error:e.message};
+    }
+    renderCameras();renderResults();
+  }
+
+  document.getElementById('progressFill').style.width='100%';
+  document.getElementById('progressTxt').textContent=`DONE ${angles.length}/${angles.length}`;
+  setTimeout(()=>document.getElementById('progressWrap').style.display='none',2000);
+
+  const ap2=PROVIDERS.find(p=>p.id===activeProv);
+  const proj={id:Date.now(),name:`Dự án ${new Date().toLocaleDateString('vi')}`,angles:angles.length,style:curStyle,provider:ap2.name,date:new Date().toLocaleString('vi'),icon:angles[0].icon};
+  history=[proj,...history].slice(0,30);
+  localStorage.setItem('dmp_hist',JSON.stringify(history));
+  renderHistory();
+  running=false;updateGenBtn();
+  toast(`✅ Hoàn tất ${angles.length} góc diễn họa!`,'ok');
+}
+
+// ── RESULTS ───────────────────────────────────────────────────────────────────
+function renderResults(){
+  const list=document.getElementById('resultsList');
+  const items=Object.values(results);
+  if(!items.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">🎨</div><p style="font-size:11px;line-height:1.6">Chọn góc nhìn và nhấn Diễn Họa AI</p></div>';return;}
+  list.innerHTML=items.map(r=>`
+    <div class="r-item" onclick="${r.status==='done'?`openModal(${r.cam.id})`:''}">
+      <div class="r-thumb">
+        ${r.status==='done'&&(r.url||r.b64)?`<img src="${r.url||r.b64}" alt="${r.cam.name}">`
+          :r.status==='loading'?`<span style="font-family:'DM Mono';font-size:9px;color:var(--accent)">RENDERING...</span>`
+          :r.status==='err'?'⚠️':`<span>${r.cam.icon}</span>`}
+      </div>
+      <div class="r-meta">
+        <span class="r-name">${r.cam.name}</span>
+        ${r.status==='done'?'<span class="tag-ok">DONE</span>':r.status==='loading'?'<span class="tag-loading">···</span>':'<span class="tag-err">ERR</span>'}
+      </div>
+      ${r.status==='done'?`<div class="r-actions"><button class="r-btn" onclick="event.stopPropagation();openModal(${r.cam.id})">🔍 Xem</button><a class="r-btn" href="${r.url||r.b64}" download="${r.cam.name}.png" onclick="event.stopPropagation()">⬇️ Tải</a></div>`:''}
+      ${r.status==='err'?`<div class="r-err">${r.error}</div>`:''}
+    </div>
+  `).join('');
+}
+
+// ── HISTORY ───────────────────────────────────────────────────────────────────
+function renderHistory(){
+  const list=document.getElementById('historyList');
+  if(!history.length){list.innerHTML='<div class="empty-state"><div class="empty-icon">📂</div><p style="font-size:11px">Chưa có dự án</p></div>';return;}
+  list.innerHTML=history.map(h=>`
+    <div class="hist-item">
+      <div class="hist-thumb">${h.icon}</div>
+      <div style="flex:1;min-width:0">
+        <div class="hist-name">${h.name}</div>
+        <div class="hist-meta">${h.angles} góc · ${h.style} · ${h.provider}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function switchTab(btn,tab){
+  document.querySelectorAll('.r-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('resultsList').style.display=tab==='results'?'block':'none';
+  document.getElementById('historyList').style.display=tab==='history'?'block':'none';
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(camId){
+  const r=results[camId];if(!r||r.status!=='done')return;
+  currentModal=r;
+  document.getElementById('modalTitle').textContent=`${r.cam.name} — ${r.cam.desc}`.toUpperCase();
+  document.getElementById('modalImgWrap').innerHTML=(r.url||r.b64)?`<img class="modal-img" src="${r.url||r.b64}" alt="${r.cam.name}">`:'' ;
+  document.getElementById('modalInfo').innerHTML=[['PHONG CÁCH',curStyle],['MÔI TRƯỜNG',curEnv],['PROVIDER',PROVIDERS.find(p=>p.id===activeProv)?.name]].map(([l,v])=>`<div class="info-chip"><div class="info-lbl">${l}</div><div class="info-val">${v}</div></div>`).join('');
+  if(r.analysis){document.getElementById('modalAnalysis').style.display='block';document.getElementById('modalAnalysisTxt').textContent=r.analysis;}
+  else document.getElementById('modalAnalysis').style.display='none';
+  document.getElementById('modalActions').innerHTML=`<a class="btn-primary" href="${r.url||r.b64}" download="${r.cam.name}-4K.png">⬇️ TẢI XUỐNG</a><button class="btn-secondary" onclick="closeModal()">Đóng</button>`;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open')}
+
+// ── START ─────────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
