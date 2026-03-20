@@ -112,22 +112,21 @@ npm run dev
 
 ```
 dmp-render/
-├── src/
-│   └── app/
-│       ├── page.js              # Main UI
-│       ├── page.module.css      # Styles
-│       ├── layout.js            # Root layout
-│       ├── globals.css          # Global CSS
-│       └── api/
-│           ├── generate/
-│           │   └── route.js     # Image generation API
-│           └── validate-key/
-│               └── route.js     # Key validation API
+├── app/
+│   ├── page.js              # Main UI
+│   ├── page.module.css      # Styles
+│   ├── layout.js            # Root layout
+│   ├── globals.css          # Global CSS
+│   └── api/
+│       ├── generate/
+│       │   └── route.js     # Image generation (DALL·E 3, Stability, Replicate)
+│       └── validate-key/
+│           └── route.js     # API key validation
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml           # GitHub Actions CI/CD
-├── .env.example                 # Template env file
-├── vercel.json                  # Vercel config
+│       └── deploy.yml       # GitHub Actions CI/CD
+├── .env.example             # Template env file
+├── vercel.json              # Vercel config (region: sin1)
 ├── next.config.js
 └── package.json
 ```
